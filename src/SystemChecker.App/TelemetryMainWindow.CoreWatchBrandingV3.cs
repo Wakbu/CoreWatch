@@ -30,6 +30,7 @@ public partial class TelemetryMainWindow
         EnhanceReportContents();
         InitializeProcessPage();
         ApplyTaskManagerDesign();
+        ApplyGridAlignment();
     }
 
     private void IncreaseWorkspaceSpacing()
@@ -40,6 +41,20 @@ public partial class TelemetryMainWindow
         {
             scroll.PanningMode = PanningMode.VerticalOnly;
             scroll.SetValue(ScrollViewer.IsDeferredScrollingEnabledProperty, false);
+        }
+    }
+
+    private void ApplyGridAlignment()
+    {
+        var cellStyle = Application.Current.TryFindResource(typeof(DataGridCell)) as Style;
+        var headerStyle = Application.Current.TryFindResource(typeof(DataGridColumnHeader)) as Style;
+        var rowStyle = Application.Current.TryFindResource(typeof(DataGridRow)) as Style;
+        foreach (var grid in Descendants<DataGrid>(this))
+        {
+            if (cellStyle is not null) grid.CellStyle = cellStyle;
+            if (headerStyle is not null) grid.ColumnHeaderStyle = headerStyle;
+            if (rowStyle is not null) grid.RowStyle = rowStyle;
+            grid.VerticalContentAlignment = VerticalAlignment.Center;
         }
     }
 
@@ -69,4 +84,5 @@ public partial class TelemetryMainWindow
         host.Children.Add(scroll);
     }
 }
+
 

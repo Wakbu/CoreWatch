@@ -189,8 +189,8 @@ public partial class TelemetryMainWindow
         grid.SelectionMode = DataGridSelectionMode.Single;
         grid.Columns.Add(ProcessNameColumn());
         grid.Columns.Add(new DataGridTextColumn { Header = "상태", Binding = new Binding("Classification"), SortMemberPath = "Classification", Width = 130 });
-        grid.Columns.Add(UsageColumn("CPU", "CpuPercent", "0.0' %'", 105, "cpu"));
-        grid.Columns.Add(UsageColumn("메모리", "MemoryMb", "N0' MB'", 135, "memory"));
+        grid.Columns.Add(UsageColumn("CPU", "CpuPercent", "{0:0.0}%", 105, "cpu"));
+        grid.Columns.Add(UsageColumn("메모리", "MemoryMb", "{0:N0} MB", 135, "memory"));
         grid.Columns.Add(new DataGridTextColumn { Header = "PID", Binding = new Binding("Id"), SortMemberPath = "Id", Width = 90 });
         return grid;
     }
@@ -308,6 +308,7 @@ public partial class TelemetryMainWindow
         var grid = new DataGrid { ItemsSource = source, AutoGenerateColumns = false, IsReadOnly = true, CanUserAddRows = false, CanUserSortColumns = true, RowHeight = rowHeight, ColumnHeaderHeight = 46, HeadersVisibility = DataGridHeadersVisibility.Column, GridLinesVisibility = DataGridGridLinesVisibility.None, Background = Brushes.White, BorderThickness = new Thickness(0), RowHeaderWidth = 0 };
         if (Application.Current.TryFindResource(typeof(DataGridRow)) is Style rowStyle) grid.RowStyle = rowStyle;
         if (Application.Current.TryFindResource(typeof(DataGridCell)) is Style cellStyle) grid.CellStyle = cellStyle;
+        if (Application.Current.TryFindResource(typeof(DataGridColumnHeader)) is Style headerStyle) grid.ColumnHeaderStyle = headerStyle;
         NeutralSelection(grid);
         return grid;
     }
@@ -340,4 +341,5 @@ public partial class TelemetryMainWindow
 
     private static Brush Muted() => new SolidColorBrush(Color.FromRgb(104, 106, 112));
 }
+
 

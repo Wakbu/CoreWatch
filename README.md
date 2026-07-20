@@ -2,14 +2,14 @@
 
 CoreWatch는 Windows PC의 실시간 성능, 하드웨어 상태, 프로세스와 벤치마크를 확인하는 .NET 9 WPF 데스크톱 애플리케이션입니다.
 
-## CoreWatch 5.2
+## CoreWatch 5.2.2
 
 - 프로세스를 `앱`, `백그라운드 프로세스`, `Windows 프로세스`로 자동 분류
 - 유형별 탭, 실시간 개수, 이름/PID/유형/보호 상태/경로 검색
-- CPU·메모리 1초 갱신, 열 정렬, 보호 정책 기반 작업 종료
+- CPU·메모리 1초 갱신, 열 정렬, 보호 정책 기반 작업 종료\n- 프로세스 메모리를 `216 MB` 형식으로 표시하며 모든 표 셀을 수직 중앙 정렬
 - Windows 11 작업 관리자에 가까운 정보 구조와 Fluent 스타일
 - 넓어진 상단·좌측 여백, 12px 표면 모서리, 둥근 검색창과 버튼
-- 얇은 오버레이형 스크롤바와 중립 회색 선택 상태
+- ViewportSize와 전체 트랙 길이를 반영하는 14px Fluent 스크롤바와 중립 회색 선택 상태
 - 하드웨어 유형/세부 정보 2단 화면과 넉넉한 셀 여백
 - 설치 프로그램에서 공식 PawnIO 2.2.0 자동 다운로드·SHA-256 검증·자동 설치
 
@@ -37,4 +37,5 @@ dotnet run --project tools/CoreWatch.V5.Verification/CoreWatch.V5.Verification.F
 ```
 
 현재 자동 무결성 검증 결과는 `16/16`입니다. 자세한 구현 상태와 다음 작업 인수인계는 [CURRENT_STATE_COREWATCH_V5_1.md](CURRENT_STATE_COREWATCH_V5_1.md)를 참고하세요.
+
 
