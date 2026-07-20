@@ -1,0 +1,17 @@
+bin/
+obj/
+.vs/
+.idea/
+.dotnet-cli/
+.nuget-packages/
+artifacts/
+TestResults/
+*.user
+*.suo
+*.pdb
+*.json
+tools/DiskSpd/arm64/
+tools/DiskSpd/x86/
+README.legacy.md
+.gitignore.legacy
+

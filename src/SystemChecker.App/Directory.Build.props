@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <CustomAfterMicrosoftCommonTargets>$(MSBuildThisFileDirectory)SystemChecker.After.targets</CustomAfterMicrosoftCommonTargets>
+  </PropertyGroup>
+</Project>

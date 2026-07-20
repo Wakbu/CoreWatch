@@ -1,0 +1,7 @@
+<Project>
+  <ItemGroup>
+    <Compile Remove="$(MSBuildProjectDirectory)\PolishedMainWindow.xaml.cs" />
+    <Compile Remove="$(MSBuildProjectDirectory)\ViewModels\ModernMainViewModel.Fixed.cs" />
+    <Compile Remove="$(MSBuildProjectDirectory)\Services\SensorMonitorService.cs" />
+  </ItemGroup>
+</Project>

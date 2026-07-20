@@ -1,0 +1,7 @@
+<Project>
+  <Import Project="..\..\Directory.Build.targets" />
+  <ItemGroup>
+    <!-- 읽기 전용 ProgressBar 바인딩을 수정한 구현으로 교체한다. -->
+    <Compile Remove="$(MSBuildProjectDirectory)\ViewModels\ModernMainViewModel.cs" />
+  </ItemGroup>
+</Project>

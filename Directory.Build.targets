@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup>
+    <!-- 초기 StartupUri 우회 구현은 WPF가 null을 허용하지 않아 컴파일에서 제외한다. -->
+    <Compile Remove="$(MSBuildProjectDirectory)\App.ModernStartup.cs" />
+  </ItemGroup>
+</Project>
