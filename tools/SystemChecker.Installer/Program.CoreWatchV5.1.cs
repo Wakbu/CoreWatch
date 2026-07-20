@@ -1,6 +1,7 @@
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.Reflection;
+using System.Security.Cryptography;
 using Forms = System.Windows.Forms;
 
 namespace CoreWatch.Installer;
@@ -8,7 +9,9 @@ namespace CoreWatch.Installer;
 internal static class Program
 {
     private const string Product = "CoreWatch";
-    private const string Version = "5.1.0";
+    private const string Version = "5.2.0";
+    private const string PawnIoUrl = "https://github.com/namazso/PawnIO.Setup/releases/download/2.2.0/PawnIO_setup.exe";
+    private const string PawnIoSha256 = "1F519A22E47187F70A1379A48CA604981C4FCF694F4E65B734AAA74A9FBA3032";
 
     [STAThread]
     private static void Main(string[] args)
@@ -19,7 +22,8 @@ internal static class Program
 
     private static void Install()
     {
-        if (Forms.MessageBox.Show("CoreWatch를 현재 사용자 계정에 설치하시겠습니까?", "CoreWatch Setup", Forms.MessageBoxButtons.YesNo, Forms.MessageBoxIcon.Question) != Forms.DialogResult.Yes) return;
+        if (Forms.MessageBox.Show("CoreWatch와 PawnIO 센서 드라이버를 설치하시겠습니까?\n\nPawnIO 2.2.0은 공식 GitHub에서 다운로드하고 SHA-256을 검증한 뒤 자동 설치합니다.", "CoreWatch Setup", Forms.MessageBoxButtons.YesNo, Forms.MessageBoxIcon.Question) != Forms.DialogResult.Yes) return;
+        var rebootRequired = InstallPawnIoAsync().GetAwaiter().GetResult();
         var directory = InstallDirectory();
         Directory.CreateDirectory(Path.Combine(directory, "tools"));
         Directory.CreateDirectory(Path.Combine(directory, "Assets"));
@@ -32,13 +36,32 @@ internal static class Program
         CreateShortcut(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs", "CoreWatch.lnk"), Path.Combine(directory, "CoreWatch.exe"));
         using var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall\CoreWatch");
         key.SetValue("DisplayName", Product); key.SetValue("DisplayVersion", Version); key.SetValue("Publisher", "CoreWatch Project"); key.SetValue("InstallLocation", directory); key.SetValue("DisplayIcon", Path.Combine(directory, "CoreWatch.exe")); key.SetValue("UninstallString", $"\"{Path.Combine(directory, "CoreWatch-Uninstall.exe")}\" --uninstall"); key.SetValue("NoModify", 1); key.SetValue("NoRepair", 1);
-        Forms.MessageBox.Show("CoreWatch 설치가 완료되었습니다.", "CoreWatch Setup", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Information);
-        Process.Start(new ProcessStartInfo(Path.Combine(directory, "CoreWatch.exe")) { UseShellExecute = true });
+        var message = rebootRequired ? "설치가 완료되었습니다. PawnIO 적용을 위해 Windows를 다시 시작한 뒤 CoreWatch를 실행하세요." : "CoreWatch와 PawnIO 설치가 완료되었습니다.";
+        Forms.MessageBox.Show(message, "CoreWatch Setup", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Information);
+        if (!rebootRequired) Process.Start(new ProcessStartInfo(Path.Combine(directory, "CoreWatch.exe")) { UseShellExecute = true });
+    }
+
+    private static async Task<bool> InstallPawnIoAsync()
+    {
+        var temporary = Path.Combine(Path.GetTempPath(), "CoreWatch-PawnIO-2.2.0.exe");
+        try
+        {
+            using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(3) };
+            await using (var output = File.Create(temporary)) await (await client.GetStreamAsync(PawnIoUrl)).CopyToAsync(output);
+            await using var input = File.OpenRead(temporary);
+            var hash = Convert.ToHexString(await SHA256.HashDataAsync(input));
+            if (!hash.Equals(PawnIoSha256, StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("PawnIO 설치 파일의 무결성 검증에 실패했습니다.");
+            using var process = Process.Start(new ProcessStartInfo(temporary, "-install -silent") { UseShellExecute = false, CreateNoWindow = true }) ?? throw new InvalidOperationException("PawnIO 설치 프로그램을 시작하지 못했습니다.");
+            process.WaitForExit();
+            if (process.ExitCode is not 0 and not 3010) throw new InvalidOperationException($"PawnIO 설치가 실패했습니다. 종료 코드: {process.ExitCode}");
+            return process.ExitCode == 3010;
+        }
+        finally { try { if (File.Exists(temporary)) File.Delete(temporary); } catch { } }
     }
 
     private static void Uninstall()
     {
-        if (Forms.MessageBox.Show("CoreWatch 프로그램 파일을 제거하시겠습니까?\n측정 기록 데이터베이스는 보존됩니다.", "CoreWatch 제거", Forms.MessageBoxButtons.YesNo, Forms.MessageBoxIcon.Warning) != Forms.DialogResult.Yes) return;
+        if (Forms.MessageBox.Show("CoreWatch 프로그램 파일을 제거하시겠습니까?\n측정 기록과 다른 프로그램이 사용할 수 있는 PawnIO 드라이버는 보존됩니다.", "CoreWatch 제거", Forms.MessageBoxButtons.YesNo, Forms.MessageBoxIcon.Warning) != Forms.DialogResult.Yes) return;
         var directory = Path.GetFullPath(InstallDirectory());
         var allowedRoot = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs")) + Path.DirectorySeparatorChar;
         if (!directory.StartsWith(allowedRoot, StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("안전하지 않은 제거 경로입니다.");
@@ -52,3 +75,4 @@ internal static class Program
     private static void Extract(string resource, string path) { using var source = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource) ?? throw new InvalidOperationException($"설치 리소스 누락: {resource}"); using var target = File.Create(path); source.CopyTo(target); }
     private static void CreateShortcut(string path, string target) { var type = Type.GetTypeFromProgID("WScript.Shell") ?? throw new InvalidOperationException("바로가기 서비스를 사용할 수 없습니다."); dynamic shell = Activator.CreateInstance(type)!; dynamic shortcut = shell.CreateShortcut(path); shortcut.TargetPath = target; shortcut.WorkingDirectory = Path.GetDirectoryName(target); shortcut.Description = Product; shortcut.Save(); }
 }
+
