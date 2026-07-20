@@ -9,9 +9,10 @@ namespace CoreWatch.Installer;
 internal static class Program
 {
     private const string Product = "CoreWatch";
-    private const string Version = "5.2.0";
+    private const string Version = "5.2.1";
     private const string PawnIoUrl = "https://github.com/namazso/PawnIO.Setup/releases/download/2.2.0/PawnIO_setup.exe";
     private const string PawnIoSha256 = "1F519A22E47187F70A1379A48CA604981C4FCF694F4E65B734AAA74A9FBA3032";
+    private sealed record PawnIoResult(string Message, bool RebootRequired, bool Failed);
 
     [STAThread]
     private static void Main(string[] args)
@@ -23,7 +24,9 @@ internal static class Program
     private static void Install()
     {
         if (Forms.MessageBox.Show("CoreWatch와 PawnIO 센서 드라이버를 설치하시겠습니까?\n\nPawnIO 2.2.0은 공식 GitHub에서 다운로드하고 SHA-256을 검증한 뒤 자동 설치합니다.", "CoreWatch Setup", Forms.MessageBoxButtons.YesNo, Forms.MessageBoxIcon.Question) != Forms.DialogResult.Yes) return;
-        var rebootRequired = InstallPawnIoAsync().GetAwaiter().GetResult();
+        PawnIoResult pawnIo;
+        try { pawnIo = InstallPawnIoAsync().GetAwaiter().GetResult(); }
+        catch (Exception ex) { pawnIo = new PawnIoResult($"PawnIO 구성은 완료하지 못했습니다: {ex.Message}\nCoreWatch는 정상 설치되며 센서 이외 기능을 사용할 수 있습니다.", false, true); }
         var directory = InstallDirectory();
         Directory.CreateDirectory(Path.Combine(directory, "tools"));
         Directory.CreateDirectory(Path.Combine(directory, "Assets"));
@@ -36,13 +39,17 @@ internal static class Program
         CreateShortcut(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs", "CoreWatch.lnk"), Path.Combine(directory, "CoreWatch.exe"));
         using var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall\CoreWatch");
         key.SetValue("DisplayName", Product); key.SetValue("DisplayVersion", Version); key.SetValue("Publisher", "CoreWatch Project"); key.SetValue("InstallLocation", directory); key.SetValue("DisplayIcon", Path.Combine(directory, "CoreWatch.exe")); key.SetValue("UninstallString", $"\"{Path.Combine(directory, "CoreWatch-Uninstall.exe")}\" --uninstall"); key.SetValue("NoModify", 1); key.SetValue("NoRepair", 1);
-        var message = rebootRequired ? "설치가 완료되었습니다. PawnIO 적용을 위해 Windows를 다시 시작한 뒤 CoreWatch를 실행하세요." : "CoreWatch와 PawnIO 설치가 완료되었습니다.";
-        Forms.MessageBox.Show(message, "CoreWatch Setup", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Information);
-        if (!rebootRequired) Process.Start(new ProcessStartInfo(Path.Combine(directory, "CoreWatch.exe")) { UseShellExecute = true });
+        var message = $"CoreWatch 설치가 완료되었습니다.\n\n{pawnIo.Message}";
+        Forms.MessageBox.Show(message, "CoreWatch Setup", Forms.MessageBoxButtons.OK, pawnIo.Failed ? Forms.MessageBoxIcon.Warning : Forms.MessageBoxIcon.Information);
+        if (!pawnIo.RebootRequired) Process.Start(new ProcessStartInfo(Path.Combine(directory, "CoreWatch.exe")) { UseShellExecute = true });
     }
 
-    private static async Task<bool> InstallPawnIoAsync()
+    private static async Task<PawnIoResult> InstallPawnIoAsync()
     {
+        var installed = PawnIoInstallDetector.GetInstalledVersion();
+        if (installed is not null && !PawnIoInstallDetector.RequiresInstall(installed))
+            return new PawnIoResult($"PawnIO {installed}이(가) 이미 설치되어 있어 드라이버 설치를 건너뛰었습니다.", false, false);
+
         var temporary = Path.Combine(Path.GetTempPath(), "CoreWatch-PawnIO-2.2.0.exe");
         try
         {
@@ -53,8 +60,16 @@ internal static class Program
             if (!hash.Equals(PawnIoSha256, StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("PawnIO 설치 파일의 무결성 검증에 실패했습니다.");
             using var process = Process.Start(new ProcessStartInfo(temporary, "-install -silent") { UseShellExecute = false, CreateNoWindow = true }) ?? throw new InvalidOperationException("PawnIO 설치 프로그램을 시작하지 못했습니다.");
             process.WaitForExit();
-            if (process.ExitCode is not 0 and not 3010) throw new InvalidOperationException($"PawnIO 설치가 실패했습니다. 종료 코드: {process.ExitCode}");
-            return process.ExitCode == 3010;
+            if (process.ExitCode is not 0 and not 3010)
+            {
+                installed = PawnIoInstallDetector.GetInstalledVersion();
+                if (installed is not null && !PawnIoInstallDetector.RequiresInstall(installed))
+                    return new PawnIoResult($"PawnIO {installed} 설치 상태를 확인했습니다.", false, false);
+                throw new InvalidOperationException($"PawnIO 설치 프로그램 종료 코드 {process.ExitCode}");
+            }
+            return process.ExitCode == 3010
+                ? new PawnIoResult("PawnIO 설치가 완료되었습니다. 드라이버 적용을 위해 Windows를 다시 시작하세요.", true, false)
+                : new PawnIoResult("PawnIO 2.2.0 설치가 완료되었습니다.", false, false);
         }
         finally { try { if (File.Exists(temporary)) File.Delete(temporary); } catch { } }
     }
@@ -75,4 +90,9 @@ internal static class Program
     private static void Extract(string resource, string path) { using var source = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource) ?? throw new InvalidOperationException($"설치 리소스 누락: {resource}"); using var target = File.Create(path); source.CopyTo(target); }
     private static void CreateShortcut(string path, string target) { var type = Type.GetTypeFromProgID("WScript.Shell") ?? throw new InvalidOperationException("바로가기 서비스를 사용할 수 없습니다."); dynamic shell = Activator.CreateInstance(type)!; dynamic shortcut = shell.CreateShortcut(path); shortcut.TargetPath = target; shortcut.WorkingDirectory = Path.GetDirectoryName(target); shortcut.Description = Product; shortcut.Save(); }
 }
+
+
+
+
+
 

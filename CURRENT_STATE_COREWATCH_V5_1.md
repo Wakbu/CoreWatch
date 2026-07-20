@@ -5,7 +5,8 @@
 - 앱: `src/SystemChecker.App/CoreWatch.V5.1.Release.csproj`
 - 설치 프로그램: `tools/SystemChecker.Installer/CoreWatch.V5.1.Installer.csproj`
 - 자동 검증: `tools/CoreWatch.V5.Verification/CoreWatch.V5.Verification.Final.csproj`
-- 표시 버전: `5.2.0`
+- 앱 표시 버전: `5.2.0`
+- 설치 프로그램 버전: `5.2.1`
 
 파일명은 기존 자동화 호환성을 위해 V5.1을 유지하지만 프로젝트 및 바이너리 버전은 5.2입니다.
 
@@ -33,14 +34,18 @@
 - CoreWatch 설치 프로그램만 `requireAdministrator` 매니페스트를 사용합니다.
 - 설치 시 공식 GitHub에서 PawnIO 2.2.0을 다운로드합니다.
 - 기대 SHA-256: `1F519A22E47187F70A1379A48CA604981C4FCF694F4E65B734AAA74A9FBA3032`
-- 검증 후 `PawnIO_setup.exe -install -silent`를 실행하며 종료 코드 0과 3010을 처리합니다.
+- 레지스트리에서 기존 PawnIO 버전을 먼저 확인하고 2.2.0 이상이면 설치를 건너뜁니다.
+- 설치가 필요한 경우에만 `PawnIO_setup.exe -install -silent`를 실행하며 종료 코드 0과 3010을 처리합니다.
+- PawnIO 단계가 실패해도 CoreWatch 본체 설치와 실행은 차단하지 않습니다.
 - PawnIO는 다른 프로그램도 사용할 수 있으므로 CoreWatch 제거 시 자동 제거하지 않습니다.
 - 기존 센서 권한 재시작과 PawnIO 설치 페이지 버튼은 제거했습니다.
 
 ## 검증 결과
 
 - Debug/Release 빌드: 경고 0, 오류 0
-- 자동 무결성 검증: 15/15
+- 자동 무결성 검증: 16/16
+- 현재 PC에서 기존 PawnIO `2.2.0.0` 감지 확인
+- 2.2.0 설치 건너뛰기 및 2.1.0 업그레이드 필요 정책 검사 통과
 - 프로세스 3분류 및 앱/백그라운드 분리 확인
 - 실제 실행 UI에서 분류 탭 개수와 1초 갱신 확인
 - 콘텐츠 헤더의 창 기준 왼쪽 위치 276px: 226px 사이드바 이후 약 50px 여백
@@ -49,7 +54,7 @@
 
 ## 배포 파일
 
-- `artifacts/CoreWatch-v5.2-Setup.exe`
+- `artifacts/CoreWatch-v5.2.1-Setup.exe`
 - `artifacts/CoreWatch-v5.2-win-x64.zip`
 
 ## 참고한 공식 자료
@@ -58,3 +63,4 @@
 - Microsoft Learn: Windows 11 디자인 원칙과 Task Manager의 실시간 데이터 표
 - PawnIO.Setup GitHub: 공식 2.2.0 릴리스와 silent CLI
 - LibreHardwareMonitor GitHub: 일부 센서는 관리자 권한 또는 저수준 드라이버 필요
+
