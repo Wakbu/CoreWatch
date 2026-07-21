@@ -47,7 +47,10 @@
 - `artifacts/CoreWatch-v5.3.0-Setup.exe`
 - `artifacts/CoreWatch-v5.3.0-win-x64.zip`
 
-SHA-256과 실제 게시 실행본 검증 결과는 v5.3.0 릴리스에 기록합니다.
+- GitHub 릴리스: https://github.com/Wakbu/CoreWatch/releases/tag/v5.3.0
+- Setup SHA-256: `815C04091D8213E371588DEE7021B7972C196ADD2AB5B22A8F8648C4CB478740`
+- ZIP SHA-256: `5CF4191966E9E219C1F1766612E8E7A648A29FA2F78AE7827DA0C070B68EBB6E`
+- 게시 실행본 버전 `5.3.0.0`, 창 제목 `CoreWatch`, 응답 상태 정상
 
 ## 다음 단계
 
