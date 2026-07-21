@@ -1,66 +1,57 @@
-# CoreWatch 5.2 구현 상태
+# CoreWatch 5.3.0 구현 상태
 
 ## 활성 프로젝트
 
 - 앱: `src/SystemChecker.App/CoreWatch.V5.1.Release.csproj`
 - 설치 프로그램: `tools/SystemChecker.Installer/CoreWatch.V5.1.Installer.csproj`
 - 자동 검증: `tools/CoreWatch.V5.Verification/CoreWatch.V5.Verification.Final.csproj`
-- 앱 표시 버전: `5.2.0`
-- 설치 프로그램 버전: `5.2.1`
+- 앱 및 설치 프로그램 버전: `5.3.0`
 
-파일명은 기존 자동화 호환성을 위해 V5.1을 유지하지만 프로젝트 및 바이너리 버전은 5.2입니다.
+파일명은 기존 자동화 호환성을 위해 V5.1을 유지합니다.
 
-## 프로세스 화면
+## 이번 구현
 
-- `ProcessMonitorService`가 최상위 창과 보호 분류를 함께 사용해 앱/백그라운드/Windows 프로세스를 구분합니다.
-- 모두, 앱, 백그라운드 프로세스, Windows 프로세스 탭이 실시간 개수를 표시합니다.
-- 이름, PID, 유형, 보호 상태와 경로를 즉시 검색합니다.
-- CPU와 메모리를 1초마다 다시 측정하고 현재 갱신 시각을 표시합니다.
-- 이름 셀은 아이콘, 이름, 유형의 2단 정보 구조입니다.
-- Windows 핵심·Windows 폴더·경로 미확인 프로세스는 종료하지 않습니다.
+- 메뉴 번호를 탐색 순서에서 다시 계산하며 OPTIMIZE를 리포트 앞에 추가했습니다.
+- 프로세스 실제 실행 파일 아이콘을 추출하고 경로별로 캐시합니다.
+- 프로세스 목록을 PID 기반으로 증분 갱신해 전체 컬렉션 교체와 주기적 깜빡임을 제거했습니다.
+- 갱신 중 동일 PID 행 컨테이너, 선택 상태, 검색과 정렬을 유지합니다.
+- 프로세스 상태·CPU·메모리·PID와 하드웨어 장치·세부 정보를 템플릿 셀로 바꿔 수직 중앙에 배치했습니다.
+- OPTIMIZE 탭에 시작 프로그램 분석, 임시 파일 정리 미리보기/승인형 정리, 최적화 전후 기준 비교를 구현했습니다.
+- Microsoft.Data.Sqlite 10.0.10과 SQLitePCLRaw 3.0.4로 업데이트해 알려진 High 취약점을 제거했습니다.
+- GitHub Actions에 Debug/Release 빌드, 취약점 검사와 자동 검증 워크플로를 추가했습니다.
 
-## 디자인
+## 최적화 안전 범위
 
-- Microsoft Windows 11 Fluent 원칙의 calm/coherent 방향과 작업 관리자 정보 구조를 참고했습니다.
-- 콘텐츠 시작 여백, 제목 간격, 표 셀 패딩을 확대했습니다.
-- 검색창, 버튼, 표면은 8~12px 모서리 반경을 사용합니다.
-- 기본 파란 선택 배경을 제거하고 중립 회색 hover/selection을 사용합니다.
-- 기본 스크롤바를 10px 폭의 둥근 thumb 스타일로 교체했습니다.
-- 하드웨어는 왼쪽 유형 탐색과 오른쪽 상세 표의 2단 구조입니다.
-
-## PawnIO 설치
-
-- CoreWatch 앱은 `requireAdministrator`를 사용하지 않습니다.
-- CoreWatch 설치 프로그램만 `requireAdministrator` 매니페스트를 사용합니다.
-- 설치 시 공식 GitHub에서 PawnIO 2.2.0을 다운로드합니다.
-- 기대 SHA-256: `1F519A22E47187F70A1379A48CA604981C4FCF694F4E65B734AAA74A9FBA3032`
-- 레지스트리에서 기존 PawnIO 버전을 먼저 확인하고 2.2.0 이상이면 설치를 건너뜁니다.
-- 설치가 필요한 경우에만 `PawnIO_setup.exe -install -silent`를 실행하며 종료 코드 0과 3010을 처리합니다.
-- PawnIO 단계가 실패해도 CoreWatch 본체 설치와 실행은 차단하지 않습니다.
-- PawnIO는 다른 프로그램도 사용할 수 있으므로 CoreWatch 제거 시 자동 제거하지 않습니다.
-- 기존 센서 권한 재시작과 PawnIO 설치 페이지 버튼은 제거했습니다.
+- 시작 프로그램은 현재 활성 등록 항목, 게시자, 등록 위치와 보수적인 권장 사항을 읽기 전용으로 표시합니다.
+- 정리 후보는 승인된 임시 폴더 내부의 24시간 이상 된 파일만 포함합니다.
+- 실제 삭제는 사용자가 체크한 항목과 확인 대화상자를 거친 경우에만 실행합니다.
+- 사용 중, 접근 제한, 승인 범위 밖 파일은 삭제하지 않습니다.
+- 최적화 기준은 CPU, 메모리, 프로세스 수, 디스크 최소 여유 공간을 기록합니다.
 
 ## 검증 결과
 
+- NuGet 복원 성공
+- 알려진 취약 패키지 없음
 - Debug/Release 빌드: 경고 0, 오류 0
-- 자동 무결성 검증: 16/16
-- 현재 PC에서 기존 PawnIO `2.2.0.0` 감지 확인
-- 2.2.0 설치 건너뛰기 및 2.1.0 업그레이드 필요 정책 검사 통과
-- 프로세스 3분류 및 앱/백그라운드 분리 확인
-- 실제 실행 UI에서 분류 탭 개수와 1초 갱신 확인
-- 콘텐츠 헤더의 창 기준 왼쪽 위치 276px: 226px 사이드바 이후 약 50px 여백
-- 설치 프로그램 관리자 매니페스트 포함 확인
-- 게시 실행본 버전 5.2.0.0 및 정상 시작 확인
+- 자동 무결성 검증: 21/21
+- Release 앱 시작 및 응답 정상
+- 메뉴 순서: `01 OVERVIEW, 02 PROCESSES, 03 HARDWARE, 04 BENCHMARK, 05 OPTIMIZE, 06 REPORT`
+- 프로세스 화면: 실제 아이콘 10개 표본 확인
+- 프로세스 상태·CPU·메모리·PID 중심 오차: 최대 0.5px
+- 하드웨어 장치·세부 정보 중심 오차: 최대 0.5px
+- 4초 실시간 갱신 후 동일 행 컨테이너 및 선택 상태 유지
+- OPTIMIZE 시작 프로그램/정리 미리보기 분석 완료 및 기준 기록 동작 확인
 
-## 배포 파일
+## 배포 산출물
 
-- `artifacts/CoreWatch-v5.2.1-Setup.exe`
-- `artifacts/CoreWatch-v5.2-win-x64.zip`
+- `artifacts/CoreWatch-v5.3.0-Setup.exe`
+- `artifacts/CoreWatch-v5.3.0-win-x64.zip`
 
-## 참고한 공식 자료
+- GitHub 릴리스: https://github.com/Wakbu/CoreWatch/releases/tag/v5.3.0
+- Setup SHA-256: `815C04091D8213E371588DEE7021B7972C196ADD2AB5B22A8F8648C4CB478740`
+- ZIP SHA-256: `5CF4191966E9E219C1F1766612E8E7A648A29FA2F78AE7827DA0C070B68EBB6E`
+- 게시 실행본 버전 `5.3.0.0`, 창 제목 `CoreWatch`, 응답 상태 정상
 
-- Microsoft Support: Task Manager는 프로세스를 apps, background processes, Windows processes로 구분
-- Microsoft Learn: Windows 11 디자인 원칙과 Task Manager의 실시간 데이터 표
-- PawnIO.Setup GitHub: 공식 2.2.0 릴리스와 silent CLI
-- LibreHardwareMonitor GitHub: 일부 센서는 관리자 권한 또는 저수준 드라이버 필요
+## 다음 단계
 
+`SYSTEM_OPTIMIZATION_ROADMAP.md`의 전원 설정 분석, 장시간 백그라운드 부하 탐지, 시작 프로그램 활성/비활성화와 되돌리기는 이후 확장 범위입니다.

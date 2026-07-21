@@ -1,40 +1,46 @@
 # CoreWatch
 
-CoreWatch는 Windows PC의 실시간 성능, 하드웨어 상태, 프로세스와 벤치마크를 확인하는 .NET 9 WPF 데스크톱 애플리케이션입니다.
+CoreWatch는 Windows PC의 실시간 성능, 하드웨어 상태, 프로세스, 벤치마크와 보수적인 시스템 최적화 기능을 제공하는 .NET 9 WPF 데스크톱 애플리케이션입니다.
 
-## CoreWatch 5.2
+## CoreWatch 5.3.0
 
-- 프로세스를 `앱`, `백그라운드 프로세스`, `Windows 프로세스`로 자동 분류
-- 유형별 탭, 실시간 개수, 이름/PID/유형/보호 상태/경로 검색
-- CPU·메모리 1초 갱신, 열 정렬, 보호 정책 기반 작업 종료
-- Windows 11 작업 관리자에 가까운 정보 구조와 Fluent 스타일
-- 넓어진 상단·좌측 여백, 12px 표면 모서리, 둥근 검색창과 버튼
-- 얇은 오버레이형 스크롤바와 중립 회색 선택 상태
-- 하드웨어 유형/세부 정보 2단 화면과 넉넉한 셀 여백
-- 설치 프로그램에서 공식 PawnIO 2.2.0 자동 다운로드·SHA-256 검증·자동 설치
+- 메뉴 순서와 번호 자동 동기화: `01 OVERVIEW → 02 PROCESSES → 03 HARDWARE → 04 BENCHMARK → 05 OPTIMIZE → 06 REPORT`
+- 프로세스를 앱, 백그라운드 프로세스, Windows 프로세스로 분류
+- 실행 파일의 실제 프로그램 아이콘 표시 및 경로별 캐시
+- PID 기반 증분 갱신으로 선택, 정렬, 스크롤 위치를 유지하고 주기적 깜빡임 제거
+- CPU·메모리 사용량 1초 갱신과 보호 정책 기반 프로세스 종료
+- 프로세스 및 하드웨어 표 텍스트의 실제 수직 중앙 정렬
+- 시작 프로그램 게시자·등록 위치·유지 권장 여부 분석
+- 24시간 이상 된 임시 파일의 정리 가능 용량 미리보기와 사용자 승인형 정리
+- CPU·메모리·프로세스 수·디스크 여유 공간을 이용한 최적화 전후 비교
+- Pull Request, 강제 푸시 및 삭제 제한을 위한 GitHub CI·브랜치 보호 구성
 
-탐색 순서는 `개요 → 프로세스 → 하드웨어 → 벤치마크 → 리포트`입니다.
+## 최적화 안전 원칙
 
-## 프로세스 분류
+- 진단과 미리보기는 시스템 설정을 변경하지 않습니다.
+- 임시 파일은 사용자가 항목을 선택하고 확인한 경우에만 삭제합니다.
+- 승인된 임시 폴더 내부, 24시간 이상 된 파일만 대상으로 하며 사용 중이거나 접근 불가능한 파일은 건너뜁니다.
+- 시작 프로그램은 근거와 권장 사항을 표시하며 자동으로 비활성화하지 않습니다.
+- Windows 핵심 서비스, 보안 기능, 업데이트, 레지스트리 트윅 및 RAM 클리너는 사용하지 않습니다.
 
-- `앱`: 최상위 창이 있는 일반 사용자 프로그램
-- `백그라운드 프로세스`: 창 없이 실행되는 일반 프로그램과 보조 작업
-- `Windows 프로세스`: Windows 핵심 프로세스 또는 Windows 디렉터리 구성요소
+## 프로세스 보호 정책
 
-보호 분류는 별도로 유지합니다. `보호된 시스템`, `Windows 구성요소`, `확인 필요`는 종료할 수 없고 `일반 프로그램`만 사용자 확인 후 종료할 수 있습니다. 이는 안전장치이며 악성 코드 판정 기능은 아닙니다.
+`보호된 시스템`, `Windows 구성요소`, `확인 필요` 프로세스는 CoreWatch에서 종료할 수 없습니다. `일반 프로그램`만 사용자 확인 후 종료할 수 있으며, 이는 안전장치이지 악성 코드 판정 기능은 아닙니다.
 
 ## 센서와 권한
 
-CoreWatch 본체는 기본적으로 일반 사용자 권한으로 실행합니다. 설치 프로그램만 관리자 권한을 요청하여 [PawnIO 2.2.0 공식 릴리스](https://github.com/namazso/PawnIO.Setup/releases/tag/2.2.0)를 `-install -silent`로 구성합니다. 다운로드 파일은 설치 전에 고정 SHA-256으로 검증합니다. 설치 전에 기존 PawnIO 버전을 확인하므로 2.2.0 이상이 있으면 재설치하지 않습니다. PawnIO 설치가 실패해도 CoreWatch 설치와 실행은 계속됩니다. 별도의 `센서 권한 재시작` 버튼은 제거했습니다.
+CoreWatch 본체는 일반 사용자 권한으로 실행합니다. 설치 프로그램만 관리자 권한을 요청하여 PawnIO 2.2.0을 구성합니다. 기존 PawnIO 2.2.0 이상이 있으면 재설치하지 않으며, 설치 실패가 CoreWatch 본체 설치와 실행을 차단하지 않습니다.
 
 일부 메인보드는 LibreHardwareMonitor가 지원하는 센서 이름이나 컨트롤러를 제공하지 않아 PawnIO 설치 후에도 CPU 온도가 없을 수 있습니다.
 
 ## 빌드 및 검증
 
 ```powershell
-dotnet build src/SystemChecker.App/CoreWatch.V5.1.Release.csproj -c Release
+dotnet restore src/SystemChecker.App/CoreWatch.V5.1.Release.csproj
+dotnet build src/SystemChecker.App/CoreWatch.V5.1.Release.csproj -c Debug -warnaserror
+dotnet build src/SystemChecker.App/CoreWatch.V5.1.Release.csproj -c Release -warnaserror
+dotnet list src/SystemChecker.App/CoreWatch.V5.1.Release.csproj package --vulnerable --include-transitive
 dotnet run --project tools/CoreWatch.V5.Verification/CoreWatch.V5.Verification.Final.csproj -c Release
 ```
 
-현재 자동 무결성 검증 결과는 `16/16`입니다. 자세한 구현 상태와 다음 작업 인수인계는 [CURRENT_STATE_COREWATCH_V5_1.md](CURRENT_STATE_COREWATCH_V5_1.md)를 참고하세요.
-
+현재 자동 무결성 검증은 `21/21`이며 알려진 취약 패키지는 없습니다. 자세한 상태는 [CURRENT_STATE_COREWATCH_V5_1.md](CURRENT_STATE_COREWATCH_V5_1.md)를 참고하세요.
