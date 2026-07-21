@@ -9,7 +9,7 @@ namespace CoreWatch.Installer;
 internal static class Program
 {
     private const string Product = "CoreWatch";
-    private const string Version = "5.7.0";
+    private const string Version = "5.10.0";
     private const string PawnIoUrl = "https://github.com/namazso/PawnIO.Setup/releases/download/2.2.0/PawnIO_setup.exe";
     private const string PawnIoSha256 = "1F519A22E47187F70A1379A48CA604981C4FCF694F4E65B734AAA74A9FBA3032";
     private sealed record PawnIoResult(string Message, bool RebootRequired, bool Failed);

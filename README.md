@@ -12,6 +12,9 @@ CoreWatch는 Windows PC의 실시간 성능, 하드웨어 상태, 프로세스, 
 - [설치 없는 Windows x64 ZIP 다운로드](https://github.com/Wakbu/CoreWatch/releases/download/v5.10.0/CoreWatch-v5.10.0-win-x64.zip)
   - 크기: `85,606,116 bytes`
   - SHA-256: `EB75F78D44260C3FD351D8D81756ED173BA0A0A1A8CF389192AE415C04B1EECE`
+- [Windows x64 설치 프로그램 다운로드](https://github.com/Wakbu/CoreWatch/releases/download/v5.10.0/CoreWatch-v5.10.0-Setup.exe)
+  - 크기: `320,031,736 bytes`
+  - SHA-256: `C1A26F919EC66B303CB6642C5A914570E14D70F0E846EF5FC088FB4C484AC2C8`
 
 - Windows GetPerformanceInfo 기반 물리 메모리·커밋·캐시·커널 풀 분석
 - 페이지 파일 자동 관리, 할당·현재·최고 사용량 진단
