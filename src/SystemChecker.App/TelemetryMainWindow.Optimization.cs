@@ -51,6 +51,7 @@ public partial class TelemetryMainWindow
         root.Children.Add(CreatePowerAnalysisPanel());
         root.Children.Add(CreateBackgroundLoadPanel());
         root.Children.Add(CreateMemoryAnalysisPanel());
+        root.Children.Add(CreateStorageDiagnosticsPanel());
         root.Children.Add(CreateStartupAnalysisPanel());
         root.Children.Add(CreateCleanupPanel());
 
@@ -265,7 +266,8 @@ public partial class TelemetryMainWindow
             var snapshotTask = _optimizationService.CaptureSnapshotAsync(_monitorCancellation.Token);
             var powerTask = _powerSettingsService.AnalyzeAsync(_monitorCancellation.Token);
             var memoryTask = _memoryAnalysisService.CaptureAsync(_monitorCancellation.Token);
-            await Task.WhenAll(startupTask, cleanupTask, snapshotTask, powerTask, memoryTask);
+            var storageTask = _storageDiagnosticsService.CaptureAsync(_monitorCancellation.Token);
+            await Task.WhenAll(startupTask, cleanupTask, snapshotTask, powerTask, memoryTask, storageTask);
 
             _startupEntries.Clear();
             foreach (var item in await startupTask) _startupEntries.Add(item);
@@ -274,6 +276,7 @@ public partial class TelemetryMainWindow
             var snapshot = await snapshotTask;
             RenderPowerAnalysis(await powerTask);
             RenderMemoryAnalysis(await memoryTask);
+            RenderStorageDiagnostics(await storageTask);
             UpdateStartupSummary();
             if (_cleanupSummary is not null) _cleanupSummary.Text = $"{OptimizationService.FormatBytes(_cleanupGroups.Sum(item => item.SizeBytes))} · {_cleanupGroups.Sum(item => item.FileCount):N0}개 파일";
             if (compareWithBaseline && _optimizationBaseline is not null) ShowOptimizationComparison(_optimizationBaseline, snapshot);
