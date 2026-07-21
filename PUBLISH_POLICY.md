@@ -11,5 +11,5 @@
 
 ## 현재 구현 버전
 
-- 커뮤니티 벤치마크 비교 기반: `5.8.0`
-- 실행 경로: `artifacts/publish/CoreWatch-v5.8.0-win-x64/CoreWatch.exe`
+- 보안형 외부·오프라인 벤치마크 비교: `5.9.0`
+- 실행 경로: `artifacts/publish/CoreWatch-v5.9.0-win-x64/CoreWatch.exe`
