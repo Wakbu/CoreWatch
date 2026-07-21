@@ -2,7 +2,14 @@
 
 CoreWatch는 Windows PC의 실시간 성능, 하드웨어 상태, 프로세스, 벤치마크와 보수적인 시스템 최적화 기능을 제공하는 .NET 9 WPF 데스크톱 애플리케이션입니다.
 
-## CoreWatch 5.3.1
+## CoreWatch 5.4.0
+
+- 활성 Windows 전원 계획, 전원 연결·배터리 상태 분석
+- CPU AC/DC 최소·최대 상태와 프로세서 부스트 모드 진단
+- 균형 조정·고성능·절전 프로필의 설치 여부와 용도별 추천
+- 변경 전 자동 JSON 백업과 마지막 전원 계획 원클릭 복원
+- GPU 전력 정책은 제조사 드라이버 영역으로 명확히 구분해 임의 변경 방지
+- 설치 없이 실행 가능한 버전별 `artifacts/publish` 폴더 유지
 
 - 메뉴 순서와 번호 자동 동기화: `01 OVERVIEW → 02 PROCESSES → 03 HARDWARE → 04 BENCHMARK → 05 OPTIMIZE → 06 REPORT`
 - 프로세스 상단 CPU·메모리 요약을 고정 폭으로 배치해 실시간 수치 변경 시 흔들림 방지
@@ -47,3 +54,4 @@ dotnet run --project tools/CoreWatch.V5.Verification/CoreWatch.V5.Verification.F
 ```
 
 현재 자동 무결성 검증은 `21/21`이며 알려진 취약 패키지는 없습니다. 자세한 상태는 [CURRENT_STATE_COREWATCH_V5_1.md](CURRENT_STATE_COREWATCH_V5_1.md)를 참고하세요.
+
