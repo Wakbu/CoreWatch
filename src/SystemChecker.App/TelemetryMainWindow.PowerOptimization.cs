@@ -25,7 +25,7 @@ public partial class TelemetryMainWindow
         surface.Padding = new Thickness(20, 0, 20, 18);
         var body = new StackPanel();
 
-        var header = new StackPanel { Height = 72, VerticalAlignment = VerticalAlignment.Center };
+        var header = new StackPanel { Height = 72, Margin = new Thickness(0, 16, 0, 0), VerticalAlignment = VerticalAlignment.Center };
         header.Children.Add(new TextBlock { Text = "전원·성능 설정", FontSize = 16, FontWeight = FontWeights.SemiBold });
         header.Children.Add(new TextBlock { Text = "현재 전원 계획과 CPU 제한을 진단합니다. 설정 변경은 확인 후 실행되며 이전 계획으로 복원할 수 있습니다.", Foreground = Muted(), FontSize = 10, Margin = new Thickness(0, 5, 0, 0) });
         body.Children.Add(header);
@@ -165,3 +165,4 @@ public partial class TelemetryMainWindow
         finally { _optimizationBusy = false; }
     }
 }
+

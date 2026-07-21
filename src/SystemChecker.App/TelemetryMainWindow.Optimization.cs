@@ -10,7 +10,7 @@ namespace SystemChecker;
 public partial class TelemetryMainWindow
 {
     private readonly OptimizationService _optimizationService = new();
-    private readonly ObservableCollection<StartupEntry> _startupEntries = [];
+    private readonly ObservableCollection<ManagedStartupEntry> _startupEntries = [];
     private readonly ObservableCollection<CleanupGroup> _cleanupGroups = [];
     private Button? _optimizationNav;
     private ScrollViewer? _optimizationPage;
@@ -117,17 +117,33 @@ public partial class TelemetryMainWindow
         var surface = Surface();
         surface.Margin = new Thickness(12, 0, 10, 12);
         var body = new Grid();
-        body.RowDefinitions.Add(new RowDefinition { Height = new GridLength(62) });
-        body.RowDefinitions.Add(new RowDefinition { Height = new GridLength(280) });
-        var header = new StackPanel { Margin = new Thickness(20, 0, 20, 0), VerticalAlignment = VerticalAlignment.Center };
-        header.Children.Add(new TextBlock { Text = "시작 프로그램 분석", FontSize = 16, FontWeight = FontWeights.SemiBold });
-        header.Children.Add(new TextBlock { Text = "게시자와 등록 위치를 확인해 부팅 시 꼭 필요한 항목인지 판단합니다. 이 화면에서는 자동으로 비활성화하지 않습니다.", Foreground = Muted(), FontSize = 10, Margin = new Thickness(0, 5, 0, 0) });
+        body.RowDefinitions.Add(new RowDefinition { Height = new GridLength(76) });
+        body.RowDefinitions.Add(new RowDefinition { Height = new GridLength(300) });
+        var header = new Grid { Margin = new Thickness(20, 0, 20, 0) };
+        header.ColumnDefinitions.Add(new ColumnDefinition());
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        var title = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+        title.Children.Add(new TextBlock { Text = "시작 프로그램 관리", FontSize = 16, FontWeight = FontWeights.SemiBold });
+        title.Children.Add(new TextBlock { Text = "Windows StartupApproved 상태를 사용하며, 변경 전 상태를 백업합니다. Windows·보안 항목은 보호됩니다.", Foreground = Muted(), FontSize = 10, Margin = new Thickness(0, 5, 0, 0) });
+        header.Children.Add(title);
+        var actions = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+        _startupRestoreButton = Action("마지막 변경 복원", RestoreStartupChanges_Click, "#F1F2F4", "#24262B");
+        _startupRestoreButton.IsEnabled = _startupManagementService.CanRestore;
+        actions.Children.Add(_startupRestoreButton);
+        _startupToggleButton = Action("선택 상태 전환", ToggleSelectedStartup_Click, "#24262B", "#FFFFFF");
+        actions.Children.Add(_startupToggleButton);
+        Grid.SetColumn(actions, 1);
+        header.Children.Add(actions);
         body.Children.Add(header);
         var grid = BaseGrid(_startupEntries, 48);
-        grid.Columns.Add(CreateCenteredTextColumn("이름", nameof(StartupEntry.Name), nameof(StartupEntry.Name), new DataGridLength(1.2, DataGridLengthUnitType.Star)));
-        grid.Columns.Add(CreateCenteredTextColumn("게시자", nameof(StartupEntry.Publisher), nameof(StartupEntry.Publisher), new DataGridLength(1.2, DataGridLengthUnitType.Star)));
-        grid.Columns.Add(CreateCenteredTextColumn("등록 위치", nameof(StartupEntry.Source), nameof(StartupEntry.Source), new DataGridLength(1.3, DataGridLengthUnitType.Star)));
-        grid.Columns.Add(CreateCenteredTextColumn("권장 사항", nameof(StartupEntry.Recommendation), nameof(StartupEntry.Recommendation), new DataGridLength(1.5, DataGridLengthUnitType.Star)));
+        grid.RowStyle = CreateStartupRowStyle();
+        grid.Columns.Add(CreateStartupSelectionColumn());
+        grid.Columns.Add(CreateCenteredTextColumn("이름", nameof(ManagedStartupEntry.Name), nameof(ManagedStartupEntry.Name), new DataGridLength(1.2, DataGridLengthUnitType.Star)));
+        grid.Columns.Add(CreateCenteredTextColumn("상태", nameof(ManagedStartupEntry.Status), nameof(ManagedStartupEntry.IsEnabled), 85));
+        grid.Columns.Add(CreateCenteredTextColumn("게시자", nameof(ManagedStartupEntry.Publisher), nameof(ManagedStartupEntry.Publisher), new DataGridLength(1.1, DataGridLengthUnitType.Star)));
+        grid.Columns.Add(CreateCenteredTextColumn("등록 위치", nameof(ManagedStartupEntry.Source), nameof(ManagedStartupEntry.Source), new DataGridLength(1.25, DataGridLengthUnitType.Star)));
+        grid.Columns.Add(CreateCenteredTextColumn("권장 사항", nameof(ManagedStartupEntry.Recommendation), nameof(ManagedStartupEntry.Recommendation), new DataGridLength(1.5, DataGridLengthUnitType.Star)));
+        grid.Columns.Add(CreateCenteredTextColumn("제한·영향", nameof(ManagedStartupEntry.Restriction), nameof(ManagedStartupEntry.Restriction), new DataGridLength(1.45, DataGridLengthUnitType.Star)));
         Grid.SetRow(grid, 1);
         body.Children.Add(grid);
         surface.Child = body;
@@ -243,7 +259,7 @@ public partial class TelemetryMainWindow
         if (_optimizationStatus is not null) _optimizationStatus.Text = "시작 프로그램과 임시 파일을 분석하는 중…";
         try
         {
-            var startupTask = _optimizationService.AnalyzeStartupAsync(_monitorCancellation.Token);
+            var startupTask = _startupManagementService.AnalyzeAsync(_monitorCancellation.Token);
             var cleanupTask = _optimizationService.ScanCleanupAsync(_monitorCancellation.Token);
             var snapshotTask = _optimizationService.CaptureSnapshotAsync(_monitorCancellation.Token);
             var powerTask = _powerSettingsService.AnalyzeAsync(_monitorCancellation.Token);
@@ -255,7 +271,7 @@ public partial class TelemetryMainWindow
             foreach (var item in await cleanupTask) _cleanupGroups.Add(item);
             var snapshot = await snapshotTask;
             RenderPowerAnalysis(await powerTask);
-            if (_startupSummary is not null) _startupSummary.Text = $"{_startupEntries.Count:N0}개 · 검토 권장 {_startupEntries.Count(item => item.Recommendation.Contains("검토")):N0}개";
+            UpdateStartupSummary();
             if (_cleanupSummary is not null) _cleanupSummary.Text = $"{OptimizationService.FormatBytes(_cleanupGroups.Sum(item => item.SizeBytes))} · {_cleanupGroups.Sum(item => item.FileCount):N0}개 파일";
             if (compareWithBaseline && _optimizationBaseline is not null) ShowOptimizationComparison(_optimizationBaseline, snapshot);
             if (_optimizationStatus is not null) _optimizationStatus.Text = $"분석 완료 · {snapshot.Summary}";
@@ -317,5 +333,7 @@ public partial class TelemetryMainWindow
         _comparisonSummary.Text = $"CPU {after.CpuPercent - before.CpuPercent:+0.0;-0.0;0.0}%p · 메모리 {after.MemoryPercent - before.MemoryPercent:+0.0;-0.0;0.0}%p · 프로세스 {after.ProcessCount - before.ProcessCount:+#;-#;0}개";
     }
 }
+
+
 
 
