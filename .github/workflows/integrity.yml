@@ -1,0 +1,32 @@
+name: CoreWatch Integrity
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-verify:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - name: Restore dependencies
+        run: dotnet restore src/SystemChecker.App/CoreWatch.V5.1.Release.csproj
+      - name: Check vulnerable packages
+        run: dotnet list src/SystemChecker.App/CoreWatch.V5.1.Release.csproj package --vulnerable --include-transitive
+      - name: Build Debug
+        run: dotnet build src/SystemChecker.App/CoreWatch.V5.1.Release.csproj -c Debug --no-restore -warnaserror
+      - name: Build Release
+        run: dotnet build src/SystemChecker.App/CoreWatch.V5.1.Release.csproj -c Release --no-restore -warnaserror
+      - name: Run integrity verification
+        run: dotnet run --project tools/CoreWatch.V5.Verification/CoreWatch.V5.Verification.Final.csproj -c Release
+
+

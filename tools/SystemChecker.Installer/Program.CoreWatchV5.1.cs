@@ -9,7 +9,7 @@ namespace CoreWatch.Installer;
 internal static class Program
 {
     private const string Product = "CoreWatch";
-    private const string Version = "5.2.2";
+    private const string Version = "5.3.0";
     private const string PawnIoUrl = "https://github.com/namazso/PawnIO.Setup/releases/download/2.2.0/PawnIO_setup.exe";
     private const string PawnIoSha256 = "1F519A22E47187F70A1379A48CA604981C4FCF694F4E65B734AAA74A9FBA3032";
     private sealed record PawnIoResult(string Message, bool RebootRequired, bool Failed);
@@ -90,10 +90,3 @@ internal static class Program
     private static void Extract(string resource, string path) { using var source = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource) ?? throw new InvalidOperationException($"설치 리소스 누락: {resource}"); using var target = File.Create(path); source.CopyTo(target); }
     private static void CreateShortcut(string path, string target) { var type = Type.GetTypeFromProgID("WScript.Shell") ?? throw new InvalidOperationException("바로가기 서비스를 사용할 수 없습니다."); dynamic shell = Activator.CreateInstance(type)!; dynamic shortcut = shell.CreateShortcut(path); shortcut.TargetPath = target; shortcut.WorkingDirectory = Path.GetDirectoryName(target); shortcut.Description = Product; shortcut.Save(); }
 }
-
-
-
-
-
-
-

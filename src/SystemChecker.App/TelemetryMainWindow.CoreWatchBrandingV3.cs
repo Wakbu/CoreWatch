@@ -30,6 +30,8 @@ public partial class TelemetryMainWindow
         EnhanceReportContents();
         InitializeProcessPage();
         ApplyTaskManagerDesign();
+        InitializeOptimizationPage();
+        ApplyNextSessionFixes();
         ApplyGridAlignment();
     }
 
@@ -84,5 +86,3 @@ public partial class TelemetryMainWindow
         host.Children.Add(scroll);
     }
 }
-
-
