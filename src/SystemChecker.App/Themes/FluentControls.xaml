@@ -126,7 +126,7 @@
         <Setter Property="Height" Value="46"/>
         <Setter Property="Padding" Value="18,0"/>
         <Setter Property="BorderBrush" Value="#E5E6E9"/>
-        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="BorderThickness" Value="0,0,1,1"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
     </Style>
@@ -141,11 +141,9 @@
     </Style>
     <Style TargetType="DataGridCell">
         <Setter Property="Padding" Value="18,0"/>
-        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="BorderThickness" Value="0,0,1,1"/>
         <Setter Property="BorderBrush" Value="#ECEDEF"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
     </Style>
 </ResourceDictionary>
-
-
