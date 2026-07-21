@@ -45,9 +45,10 @@ public partial class TelemetryMainWindow
             _processNav.Click += (_, _) => { if (_optimizationPage is not null) _optimizationPage.Visibility = Visibility.Collapsed; if (_optimizationNav is not null) _optimizationNav.Tag = null; };
 
         var root = new StackPanel { Margin = new Thickness(8, 6, 10, 18) };
-        root.Children.Add(PageHeader("시스템 최적화", "시작 프로그램과 정리 가능 공간을 분석하고 변경 전후 효과를 수치로 비교합니다.", out _));
+        root.Children.Add(PageHeader("시스템 최적화", "전원 설정, 시작 프로그램과 정리 가능 공간을 분석하고 변경 전후 효과를 수치로 비교합니다.", out _));
         root.Children.Add(CreateOptimizationToolbar());
         root.Children.Add(CreateOptimizationSummary());
+        root.Children.Add(CreatePowerAnalysisPanel());
         root.Children.Add(CreateStartupAnalysisPanel());
         root.Children.Add(CreateCleanupPanel());
 
@@ -244,13 +245,15 @@ public partial class TelemetryMainWindow
             var startupTask = _optimizationService.AnalyzeStartupAsync(_monitorCancellation.Token);
             var cleanupTask = _optimizationService.ScanCleanupAsync(_monitorCancellation.Token);
             var snapshotTask = _optimizationService.CaptureSnapshotAsync(_monitorCancellation.Token);
-            await Task.WhenAll(startupTask, cleanupTask, snapshotTask);
+            var powerTask = _powerSettingsService.AnalyzeAsync(_monitorCancellation.Token);
+            await Task.WhenAll(startupTask, cleanupTask, snapshotTask, powerTask);
 
             _startupEntries.Clear();
             foreach (var item in await startupTask) _startupEntries.Add(item);
             _cleanupGroups.Clear();
             foreach (var item in await cleanupTask) _cleanupGroups.Add(item);
             var snapshot = await snapshotTask;
+            RenderPowerAnalysis(await powerTask);
             if (_startupSummary is not null) _startupSummary.Text = $"{_startupEntries.Count:N0}개 · 검토 권장 {_startupEntries.Count(item => item.Recommendation.Contains("검토")):N0}개";
             if (_cleanupSummary is not null) _cleanupSummary.Text = $"{OptimizationService.FormatBytes(_cleanupGroups.Sum(item => item.SizeBytes))} · {_cleanupGroups.Sum(item => item.FileCount):N0}개 파일";
             if (compareWithBaseline && _optimizationBaseline is not null) ShowOptimizationComparison(_optimizationBaseline, snapshot);
@@ -313,3 +316,4 @@ public partial class TelemetryMainWindow
         _comparisonSummary.Text = $"CPU {after.CpuPercent - before.CpuPercent:+0.0;-0.0;0.0}%p · 메모리 {after.MemoryPercent - before.MemoryPercent:+0.0;-0.0;0.0}%p · 프로세스 {after.ProcessCount - before.ProcessCount:+#;-#;0}개";
     }
 }
+
