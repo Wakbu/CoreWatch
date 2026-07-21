@@ -144,7 +144,8 @@ public partial class TelemetryMainWindow
         header.Children.Add(new TextBlock { Text = "24시간 이상 된 임시 파일만 표시합니다. 항목을 선택하고 확인한 경우에만 삭제합니다.", Foreground = Muted(), FontSize = 10, Margin = new Thickness(0, 5, 0, 0) });
         body.Children.Add(header);
         var grid = BaseGrid(_cleanupGroups, 52);
-        grid.Columns.Add(new DataGridCheckBoxColumn { Header = "선택", Binding = new Binding(nameof(CleanupGroup.IsSelected)) { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }, Width = 70 });
+        grid.RowStyle = CreateCleanupRowStyle();
+        grid.Columns.Add(CreateCleanupSelectionColumn());
         grid.Columns.Add(CreateCenteredTextColumn("항목", nameof(CleanupGroup.Category), nameof(CleanupGroup.Category), new DataGridLength(1.2, DataGridLengthUnitType.Star)));
         grid.Columns.Add(CreateCenteredTextColumn("예상 확보", nameof(CleanupGroup.SizeText), nameof(CleanupGroup.SizeBytes), 110));
         grid.Columns.Add(CreateCenteredTextColumn("파일", nameof(CleanupGroup.FileCount), nameof(CleanupGroup.FileCount), 80));
@@ -153,6 +154,72 @@ public partial class TelemetryMainWindow
         body.Children.Add(grid);
         surface.Child = body;
         return surface;
+    }
+
+    private static DataGridTemplateColumn CreateCleanupSelectionColumn()
+    {
+        var checkBox = new FrameworkElementFactory(typeof(CheckBox));
+        checkBox.SetBinding(ToggleButton.IsCheckedProperty, new Binding(nameof(CleanupGroup.IsSelected)) { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged });
+        checkBox.SetValue(FrameworkElement.WidthProperty, 22d);
+        checkBox.SetValue(FrameworkElement.HeightProperty, 22d);
+        checkBox.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+        checkBox.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
+        checkBox.SetValue(UIElement.FocusableProperty, false);
+        checkBox.SetValue(Control.TemplateProperty, CreateCleanupCheckBoxTemplate());
+        return new DataGridTemplateColumn
+        {
+            Header = "정리",
+            CellTemplate = new DataTemplate { VisualTree = checkBox },
+            Width = 78
+        };
+    }
+
+    private static ControlTemplate CreateCleanupCheckBoxTemplate()
+    {
+        var shell = new FrameworkElementFactory(typeof(Border));
+        shell.Name = "Shell";
+        shell.SetValue(FrameworkElement.WidthProperty, 20d);
+        shell.SetValue(FrameworkElement.HeightProperty, 20d);
+        shell.SetValue(Border.CornerRadiusProperty, new CornerRadius(5));
+        shell.SetValue(Border.BackgroundProperty, Brushes.White);
+        shell.SetValue(Border.BorderBrushProperty, new SolidColorBrush(Color.FromRgb(184, 189, 198)));
+        shell.SetValue(Border.BorderThicknessProperty, new Thickness(1));
+
+        var mark = new FrameworkElementFactory(typeof(TextBlock));
+        mark.Name = "Mark";
+        mark.SetValue(TextBlock.TextProperty, "✓");
+        mark.SetValue(TextBlock.FontFamilyProperty, new FontFamily("Segoe UI"));
+        mark.SetValue(TextBlock.FontSizeProperty, 13d);
+        mark.SetValue(TextBlock.FontWeightProperty, FontWeights.SemiBold);
+        mark.SetValue(TextBlock.ForegroundProperty, Brushes.White);
+        mark.SetValue(TextBlock.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+        mark.SetValue(TextBlock.VerticalAlignmentProperty, VerticalAlignment.Center);
+        mark.SetValue(UIElement.VisibilityProperty, Visibility.Collapsed);
+        shell.AppendChild(mark);
+
+        var template = new ControlTemplate(typeof(CheckBox)) { VisualTree = shell };
+        var checkedTrigger = new Trigger { Property = ToggleButton.IsCheckedProperty, Value = true };
+        checkedTrigger.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(Color.FromRgb(34, 105, 170)), "Shell"));
+        checkedTrigger.Setters.Add(new Setter(Border.BorderBrushProperty, new SolidColorBrush(Color.FromRgb(34, 105, 170)), "Shell"));
+        checkedTrigger.Setters.Add(new Setter(UIElement.VisibilityProperty, Visibility.Visible, "Mark"));
+        template.Triggers.Add(checkedTrigger);
+        var hoverTrigger = new Trigger { Property = UIElement.IsMouseOverProperty, Value = true };
+        hoverTrigger.Setters.Add(new Setter(Border.BorderBrushProperty, new SolidColorBrush(Color.FromRgb(72, 125, 180)), "Shell"));
+        template.Triggers.Add(hoverTrigger);
+        var disabledTrigger = new Trigger { Property = UIElement.IsEnabledProperty, Value = false };
+        disabledTrigger.Setters.Add(new Setter(UIElement.OpacityProperty, .45, "Shell"));
+        template.Triggers.Add(disabledTrigger);
+        return template;
+    }
+
+    private static Style CreateCleanupRowStyle()
+    {
+        var basedOn = Application.Current.TryFindResource(typeof(DataGridRow)) as Style;
+        var style = new Style(typeof(DataGridRow), basedOn);
+        var selected = new DataTrigger { Binding = new Binding(nameof(CleanupGroup.IsSelected)), Value = true };
+        selected.Setters.Add(new Setter(Control.BackgroundProperty, new SolidColorBrush(Color.FromRgb(242, 247, 252))));
+        style.Triggers.Add(selected);
+        return style;
     }
 
     private async void OptimizationNav_Click(object sender, RoutedEventArgs e)

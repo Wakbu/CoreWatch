@@ -47,8 +47,8 @@ public partial class TelemetryMainWindow
         page.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
         var header = PageHeader("프로세스", "앱, 백그라운드 작업과 Windows 구성 요소의 실시간 리소스 사용량", out var headerRight);
-        headerRight.Children.Add(Summary("CPU", nameof(ViewModels.TelemetryV4ViewModel.CpuValue)));
-        headerRight.Children.Add(Summary("메모리", nameof(ViewModels.TelemetryV4ViewModel.MemoryDetail)));
+        headerRight.Children.Add(Summary("CPU", nameof(ViewModels.TelemetryV4ViewModel.CpuValue), 96));
+        headerRight.Children.Add(Summary("메모리", nameof(ViewModels.TelemetryV4ViewModel.MemoryDetail), 220));
         page.Children.Add(header);
 
         var surface = Surface();
@@ -291,11 +291,11 @@ public partial class TelemetryMainWindow
         return header;
     }
 
-    private FrameworkElement Summary(string label, string binding)
+    private FrameworkElement Summary(string label, string binding, double width)
     {
-        var stack = new StackPanel { Margin = new Thickness(22, 0, 2, 0), MinWidth = 128 };
+        var stack = new StackPanel { Margin = new Thickness(22, 0, 2, 0), Width = width };
         stack.Children.Add(new TextBlock { Text = label, Foreground = Muted(), FontSize = 10, HorizontalAlignment = HorizontalAlignment.Right });
-        var value = new TextBlock { FontSize = 18, FontWeight = FontWeights.SemiBold, HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0, 5, 0, 0) };
+        var value = new TextBlock { FontSize = 18, FontWeight = FontWeights.SemiBold, FontFamily = new FontFamily("Consolas"), HorizontalAlignment = HorizontalAlignment.Stretch, TextAlignment = TextAlignment.Right, TextTrimming = TextTrimming.CharacterEllipsis, Margin = new Thickness(0, 5, 0, 0) };
         value.SetBinding(TextBlock.TextProperty, new Binding(binding));
         stack.Children.Add(value);
         return stack;
@@ -341,5 +341,3 @@ public partial class TelemetryMainWindow
 
     private static Brush Muted() => new SolidColorBrush(Color.FromRgb(104, 106, 112));
 }
-
-

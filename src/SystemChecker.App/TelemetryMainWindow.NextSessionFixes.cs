@@ -58,6 +58,7 @@ public partial class TelemetryMainWindow
     {
         var root = new FrameworkElementFactory(typeof(Grid));
         root.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Stretch);
+        root.SetValue(FrameworkElement.MarginProperty, new Thickness(18, 0, 10, 0));
 
         var iconShell = new FrameworkElementFactory(typeof(Border));
         iconShell.SetValue(FrameworkElement.WidthProperty, 32d);
@@ -116,6 +117,7 @@ public partial class TelemetryMainWindow
     {
         var root = new FrameworkElementFactory(typeof(Grid));
         root.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Stretch);
+        root.SetValue(FrameworkElement.MarginProperty, new Thickness(18, 0, 14, 0));
         var text = new FrameworkElementFactory(typeof(TextBlock));
         text.SetBinding(TextBlock.TextProperty, new Binding(path));
         text.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
@@ -210,5 +212,3 @@ public partial class TelemetryMainWindow
         UpdateVisibleProcessCount();
     }
 }
-
-
