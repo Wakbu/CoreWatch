@@ -49,6 +49,7 @@ public partial class TelemetryMainWindow
         root.Children.Add(CreateOptimizationToolbar());
         root.Children.Add(CreateOptimizationSummary());
         root.Children.Add(CreatePowerAnalysisPanel());
+        root.Children.Add(CreateBackgroundLoadPanel());
         root.Children.Add(CreateStartupAnalysisPanel());
         root.Children.Add(CreateCleanupPanel());
 
@@ -316,4 +317,5 @@ public partial class TelemetryMainWindow
         _comparisonSummary.Text = $"CPU {after.CpuPercent - before.CpuPercent:+0.0;-0.0;0.0}%p · 메모리 {after.MemoryPercent - before.MemoryPercent:+0.0;-0.0;0.0}%p · 프로세스 {after.ProcessCount - before.ProcessCount:+#;-#;0}개";
     }
 }
+
 
