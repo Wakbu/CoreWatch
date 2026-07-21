@@ -2,14 +2,23 @@
 
 CoreWatch는 Windows PC의 실시간 성능, 하드웨어 상태, 프로세스, 벤치마크와 보수적인 시스템 최적화 기능을 제공하는 .NET 9 WPF 데스크톱 애플리케이션입니다.
 
-## CoreWatch 5.7.0
+## CoreWatch 5.10.0
+
+- 사이드바 탭별 접이식 기능 트리와 섹션 바로가기
+- TRIM, 볼륨 여유 공간, 파일 시스템 오류 상태와 보수적인 권장 사항
+- 외부 서버 없이 이 PC의 동일 버전 벤치마크 기록만 비교
+- 설치 없는 실행본: `artifacts/publish/CoreWatch-v5.10.0-win-x64/CoreWatch.exe`
+- [GitHub v5.10.0 릴리스](https://github.com/Wakbu/CoreWatch/releases/tag/v5.10.0)
+- [설치 없는 Windows x64 ZIP 다운로드](https://github.com/Wakbu/CoreWatch/releases/download/v5.10.0/CoreWatch-v5.10.0-win-x64.zip)
+  - 크기: `85,606,116 bytes`
+  - SHA-256: `EB75F78D44260C3FD351D8D81756ED173BA0A0A1A8CF389192AE415C04B1EECE`
 
 - Windows GetPerformanceInfo 기반 물리 메모리·커밋·캐시·커널 풀 분석
 - 페이지 파일 자동 관리, 할당·현재·최고 사용량 진단
 - 메모리 압축 상태와 일반 권한 조회 제한 구분
 - 프로세스별 작업 집합·전용 커밋·최대 작업 집합·스레드 표시
 - 커밋 한계와 물리 메모리 압박 기준의 정상·주의·위험 판정
-- 동일 CoreWatch 버전 결과만 비교하는 익명 커뮤니티 벤치마크 설계 문서 추가
+- 인터넷 연결 없이 동일 벤치마크 버전의 이 PC 로컬 기록만 비교
 
 - 전원·성능 설정 카드 제목에 16px 상단 여백 적용
 - Windows StartupApproved 기반 시작 프로그램 활성·비활성 상태 표시
@@ -74,7 +83,7 @@ dotnet list src/SystemChecker.App/CoreWatch.V5.1.Release.csproj package --vulner
 dotnet run --project tools/CoreWatch.V5.Verification/CoreWatch.V5.Verification.Final.csproj -c Release
 ```
 
-현재 자동 무결성 검증은 `21/21`이며 알려진 취약 패키지는 없습니다. 자세한 상태는 [CURRENT_STATE_COREWATCH_V5_1.md](CURRENT_STATE_COREWATCH_V5_1.md)를 참고하세요.
+현재 자동 무결성 검증은 `37/37`이며 알려진 취약 패키지는 없습니다. 자세한 상태는 [CURRENT_STATE_COREWATCH_V5_1.md](CURRENT_STATE_COREWATCH_V5_1.md)를 참고하세요.
 
 
 
