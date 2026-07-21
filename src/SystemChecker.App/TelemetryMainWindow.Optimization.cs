@@ -50,6 +50,7 @@ public partial class TelemetryMainWindow
         root.Children.Add(CreateOptimizationSummary());
         root.Children.Add(CreatePowerAnalysisPanel());
         root.Children.Add(CreateBackgroundLoadPanel());
+        root.Children.Add(CreateMemoryAnalysisPanel());
         root.Children.Add(CreateStartupAnalysisPanel());
         root.Children.Add(CreateCleanupPanel());
 
@@ -263,7 +264,8 @@ public partial class TelemetryMainWindow
             var cleanupTask = _optimizationService.ScanCleanupAsync(_monitorCancellation.Token);
             var snapshotTask = _optimizationService.CaptureSnapshotAsync(_monitorCancellation.Token);
             var powerTask = _powerSettingsService.AnalyzeAsync(_monitorCancellation.Token);
-            await Task.WhenAll(startupTask, cleanupTask, snapshotTask, powerTask);
+            var memoryTask = _memoryAnalysisService.CaptureAsync(_monitorCancellation.Token);
+            await Task.WhenAll(startupTask, cleanupTask, snapshotTask, powerTask, memoryTask);
 
             _startupEntries.Clear();
             foreach (var item in await startupTask) _startupEntries.Add(item);
@@ -271,6 +273,7 @@ public partial class TelemetryMainWindow
             foreach (var item in await cleanupTask) _cleanupGroups.Add(item);
             var snapshot = await snapshotTask;
             RenderPowerAnalysis(await powerTask);
+            RenderMemoryAnalysis(await memoryTask);
             UpdateStartupSummary();
             if (_cleanupSummary is not null) _cleanupSummary.Text = $"{OptimizationService.FormatBytes(_cleanupGroups.Sum(item => item.SizeBytes))} · {_cleanupGroups.Sum(item => item.FileCount):N0}개 파일";
             if (compareWithBaseline && _optimizationBaseline is not null) ShowOptimizationComparison(_optimizationBaseline, snapshot);
@@ -333,6 +336,7 @@ public partial class TelemetryMainWindow
         _comparisonSummary.Text = $"CPU {after.CpuPercent - before.CpuPercent:+0.0;-0.0;0.0}%p · 메모리 {after.MemoryPercent - before.MemoryPercent:+0.0;-0.0;0.0}%p · 프로세스 {after.ProcessCount - before.ProcessCount:+#;-#;0}개";
     }
 }
+
 
 
 

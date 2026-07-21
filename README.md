@@ -2,7 +2,14 @@
 
 CoreWatch는 Windows PC의 실시간 성능, 하드웨어 상태, 프로세스, 벤치마크와 보수적인 시스템 최적화 기능을 제공하는 .NET 9 WPF 데스크톱 애플리케이션입니다.
 
-## CoreWatch 5.6.0
+## CoreWatch 5.7.0
+
+- Windows GetPerformanceInfo 기반 물리 메모리·커밋·캐시·커널 풀 분석
+- 페이지 파일 자동 관리, 할당·현재·최고 사용량 진단
+- 메모리 압축 상태와 일반 권한 조회 제한 구분
+- 프로세스별 작업 집합·전용 커밋·최대 작업 집합·스레드 표시
+- 커밋 한계와 물리 메모리 압박 기준의 정상·주의·위험 판정
+- 동일 CoreWatch 버전 결과만 비교하는 익명 커뮤니티 벤치마크 설계 문서 추가
 
 - 전원·성능 설정 카드 제목에 16px 상단 여백 적용
 - Windows StartupApproved 기반 시작 프로그램 활성·비활성 상태 표시
@@ -68,6 +75,7 @@ dotnet run --project tools/CoreWatch.V5.Verification/CoreWatch.V5.Verification.F
 ```
 
 현재 자동 무결성 검증은 `21/21`이며 알려진 취약 패키지는 없습니다. 자세한 상태는 [CURRENT_STATE_COREWATCH_V5_1.md](CURRENT_STATE_COREWATCH_V5_1.md)를 참고하세요.
+
 
 
 
