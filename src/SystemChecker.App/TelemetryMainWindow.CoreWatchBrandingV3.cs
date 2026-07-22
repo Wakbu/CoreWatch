@@ -35,6 +35,7 @@ public partial class TelemetryMainWindow
         ApplyNextSessionFixes();
         ApplyGridAlignment();
         InitializeFeatureTreeNavigation();
+        InitializeNestedScrollCoordination();
     }
 
     private void IncreaseWorkspaceSpacing()

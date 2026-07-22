@@ -26,7 +26,7 @@ internal static class ReportEnhancementVerification
             [40d, 50d],
             [1d, 3d],
             [2d, 4d]);
-        Check(report.CoreWatchVersion == "6.0.0" && report.Assessment == "확인 필요", "report executive assessment");
+        Check(report.CoreWatchVersion == "6.1.0" && report.Assessment == "확인 필요", "report executive assessment");
         Check(report.Telemetry.SampleCount == 3 && report.Telemetry.CpuAverage == 20 && report.Telemetry.NetworkPeakMbps == 4, "report telemetry summary");
 
         var directory = Path.Combine(Path.GetTempPath(), $"corewatch-report-{Guid.NewGuid():N}");
@@ -40,7 +40,7 @@ internal static class ReportEnhancementVerification
             service.ExportJsonAsync(json, report).GetAwaiter().GetResult();
             service.ExportHtml(html, report);
             service.ExportPdf(pdf, report);
-            Check(File.ReadAllText(json).Contains("\"CoreWatchVersion\": \"6.0.0\"", StringComparison.Ordinal), "report JSON export");
+            Check(File.ReadAllText(json).Contains("\"CoreWatchVersion\": \"6.1.0\"", StringComparison.Ordinal), "report JSON export");
             Check(File.ReadAllText(html).Contains("&lt;확인 필요&gt;", StringComparison.Ordinal) && new FileInfo(pdf).Length > 1_000, "report HTML and PDF export");
         }
         finally

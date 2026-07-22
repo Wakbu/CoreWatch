@@ -48,6 +48,10 @@ public partial class TelemetryMainWindow
         root.Children.Add(PageHeader("시스템 최적화", "전원 설정, 시작 프로그램과 정리 가능 공간을 분석하고 변경 전후 효과를 수치로 비교합니다.", out _));
         root.Children.Add(CreateOptimizationToolbar());
         root.Children.Add(CreateOptimizationSummary());
+        root.Children.Add(CreateAutomaticUpdatePanel());
+        root.Children.Add(CreateStorageMaintenancePanel());
+        root.Children.Add(CreateNetworkDiagnosticsPanel());
+        root.Children.Add(CreatePersonalizedRecommendationPanel());
         root.Children.Add(CreatePowerAnalysisPanel());
         root.Children.Add(CreateBackgroundLoadPanel());
         root.Children.Add(CreateMemoryAnalysisPanel());
