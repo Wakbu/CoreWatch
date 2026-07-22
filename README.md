@@ -8,7 +8,10 @@ CoreWatch는 Windows PC의 실시간 성능, 하드웨어 상태, 프로세스, 
   - 새 버전이 있을 때만 `업데이트 vX.Y.Z` 배지 표시
   - 사용자가 누른 뒤에만 설치 파일 다운로드
   - GitHub Release SHA-256과 일치한 설치 파일만 실행 가능
-- 네트워크 진단 표의 좌우 경계·높이·스크롤바 공간을 고정하고 열·행 크기 변경 차단
+- 네트워크 진단 표의 좌우 경계·높이를 고정하고 열·행 크기 변경 차단
+- 바깥 페이지 안의 표는 내부 스크롤바 대신 `모두 보기 · N개`로 펼치며 바깥 스크롤만 사용
+- 저장 공간 정리 실행 버튼을 미리보기 목록 바로 위로 이동
+- 벤치마크 실행 단계·진행률 표시를 추가하고 조회 표의 파란 선택 배경 제거
 - 개인화 추천의 기본 ComboBox를 현재 UI와 어울리는 4개 용도 세그먼트 버튼으로 교체
 - 하드웨어 기능 트리의 CPU·GPU·메모리·저장장치 선택이 실제 상세 목록으로 이동하도록 수정
 - 내부 표 위 마우스 휠은 바깥 페이지 스크롤을 우선 사용
@@ -17,11 +20,11 @@ CoreWatch는 Windows PC의 실시간 성능, 하드웨어 상태, 프로세스, 
 
 - [GitHub v6.1.1 릴리스](https://github.com/Wakbu/CoreWatch/releases/tag/v6.1.1)
 - [설치 없는 Windows x64 ZIP](https://github.com/Wakbu/CoreWatch/releases/download/v6.1.1/CoreWatch-v6.1.1-win-x64.zip)
-  - 크기: `85,636,716 bytes`
-  - SHA-256: `F0397645AB487F457E4D6875726D0E0A07CEADC4F335983E782FE73A5F9AA143`
+  - 크기: `85,580,620 bytes`
+  - SHA-256: `7A48040575FA4E69BE2740D03A64F91A8D03A78FB062AB05E2D09072AD93576C`
 - [Windows x64 설치 프로그램](https://github.com/Wakbu/CoreWatch/releases/download/v6.1.1/CoreWatch-v6.1.1-Setup.exe)
-  - 크기: `320,105,462 bytes`
-  - SHA-256: `1C4C5B3FA4DB5137065A0EDB1797AE139CA39A2214369BEE73FF5F7C9AC12355`
+  - 크기: `320,109,994 bytes`
+  - SHA-256: `4E1F76055BB44854B06C36176D1BA5090D5EA6988C2A4215C87CB458CC15540C`
 - 설치 없이 실행: `artifacts/publish/CoreWatch-v6.1.1-win-x64/CoreWatch.exe`
 
 ## 주요 기능
@@ -53,4 +56,4 @@ dotnet list src/SystemChecker.App/CoreWatch.V5.1.Release.csproj package --vulner
 dotnet run --project tools/CoreWatch.V5.Verification/CoreWatch.V5.Verification.Final.csproj -c Release
 ```
 
-자동 무결성 검증은 기존 핵심 `37/37`, 확장 `8/8`과 UI·정책 `6/6`을 통과합니다. 자세한 상태는 [CURRENT_STATE_COREWATCH_V5_1.md](CURRENT_STATE_COREWATCH_V5_1.md)를 참고하세요.
+자동 무결성 검증은 기존 핵심 `37/37`, 확장 `8/8`과 UI·정책 `7/7`을 통과합니다. 자세한 상태는 [CURRENT_STATE_COREWATCH_V5_1.md](CURRENT_STATE_COREWATCH_V5_1.md)를 참고하세요.

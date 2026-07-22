@@ -15,6 +15,7 @@ public partial class TelemetryMainWindow
     private readonly ObservableCollection<NetworkAdapterDiagnostic> _networkAdapters = [];
     private readonly ObservableCollection<LatencyDiagnostic> _networkLatencies = [];
     private readonly Dictionary<string, Button> _recommendationPurposeButtons = [];
+    private IReadOnlyList<NetworkAdapterDiagnostic> _allNetworkAdapters = [];
     private UpdateRelease? _latestUpdate;
     private string? _downloadedUpdatePath;
     private TextBlock? _storageSenseValue;
@@ -23,12 +24,14 @@ public partial class TelemetryMainWindow
     private TextBlock? _maintenanceRecommendation;
     private TextBlock? _networkStatus;
     private TextBox? _networkTarget;
+    private Button? _networkAdapterToggle;
     private TextBlock? _recommendationScore;
     private TextBlock? _recommendationItems;
     private string _recommendationPurpose = "일반";
     private int _networkWarningCount;
     private bool _updateCheckStarted;
     private bool _updateBusy;
+    private bool _networkAdaptersExpanded;
 
     private void InitializeUpdateNotification()
     {
@@ -97,7 +100,6 @@ public partial class TelemetryMainWindow
 
         var adapters = BaseGrid(_networkAdapters, 42);
         ConfigureDiagnosticGrid(adapters);
-        adapters.Height = 212;
         adapters.Columns.Add(CreateCenteredTextColumn("어댑터", nameof(NetworkAdapterDiagnostic.Name), nameof(NetworkAdapterDiagnostic.Name), new DataGridLength(1, DataGridLengthUnitType.Star)));
         adapters.Columns.Add(CreateCenteredTextColumn("링크 속도", nameof(NetworkAdapterDiagnostic.Speed), nameof(NetworkAdapterDiagnostic.Speed), 100));
         adapters.Columns.Add(CreateCenteredTextColumn("수신 오류", nameof(NetworkAdapterDiagnostic.ReceiveErrors), nameof(NetworkAdapterDiagnostic.ReceiveErrors), 85));
@@ -105,6 +107,16 @@ public partial class TelemetryMainWindow
         adapters.Columns.Add(CreateCenteredTextColumn("폐기", nameof(NetworkAdapterDiagnostic.Discards), nameof(NetworkAdapterDiagnostic.Discards), 75));
         adapters.Columns.Add(CreateCenteredTextColumn("판정", nameof(NetworkAdapterDiagnostic.Assessment), nameof(NetworkAdapterDiagnostic.Assessment), 105));
         body.Children.Add(adapters);
+        _networkAdapterToggle = Action("모두 보기", (_, _) =>
+        {
+            _networkAdaptersExpanded = !_networkAdaptersExpanded;
+            RenderNetworkAdapters();
+        }, "#F1F2F4", "#24262B");
+        _networkAdapterToggle.Visibility = Visibility.Collapsed;
+        _networkAdapterToggle.HorizontalAlignment = HorizontalAlignment.Left;
+        _networkAdapterToggle.Margin = new Thickness(0, 8, 0, 0);
+        _networkAdapterToggle.Padding = new Thickness(12, 6, 12, 6);
+        body.Children.Add(_networkAdapterToggle);
 
         var latency = BaseGrid(_networkLatencies, 42);
         ConfigureDiagnosticGrid(latency);
@@ -122,12 +134,13 @@ public partial class TelemetryMainWindow
 
     internal static void ConfigureDiagnosticGrid(DataGrid grid)
     {
+        grid.Tag = "CustomExpandable";
         grid.CanUserResizeColumns = false;
         grid.CanUserResizeRows = false;
         grid.CanUserReorderColumns = false;
         grid.CanUserAddRows = false;
         grid.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
-        grid.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+        grid.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
     }
 
     private FrameworkElement CreatePersonalizedRecommendationPanel()
@@ -214,6 +227,15 @@ public partial class TelemetryMainWindow
         if (_maintenanceRecommendation is not null) _maintenanceRecommendation.Text = result.Recommendation;
     }
 
+    private void RenderNetworkAdapters()
+    {
+        const int collapsedCount = 8;
+        _networkAdapters.Clear();
+        foreach (var item in (_networkAdaptersExpanded ? _allNetworkAdapters : _allNetworkAdapters.Take(collapsedCount))) _networkAdapters.Add(item);
+        if (_networkAdapterToggle is null) return;
+        _networkAdapterToggle.Visibility = _allNetworkAdapters.Count > collapsedCount ? Visibility.Visible : Visibility.Collapsed;
+        _networkAdapterToggle.Content = _networkAdaptersExpanded ? "접기" : $"모두 보기 · {_allNetworkAdapters.Count}개";
+    }
     private async Task RefreshNetworkDiagnosticsAsync()
     {
         if (_optimizationBusy) return; _optimizationBusy = true;
@@ -221,7 +243,7 @@ public partial class TelemetryMainWindow
         {
             if (_networkStatus is not null) _networkStatus.Text = "네트워크 진단 중…";
             var result = await _networkDiagnosticsService.CaptureAsync(_networkTarget?.Text, _monitorCancellation.Token);
-            _networkAdapters.Clear(); foreach (var item in result.Adapters) _networkAdapters.Add(item);
+            _allNetworkAdapters = result.Adapters; _networkAdaptersExpanded = false; RenderNetworkAdapters();
             _networkLatencies.Clear(); foreach (var item in result.Latencies) _networkLatencies.Add(item);
             _networkWarningCount = result.Adapters.Count(item => item.Assessment != "정상") + result.Latencies.Count(item => item.Assessment != "정상");
             if (_networkStatus is not null) _networkStatus.Text = result.Summary;

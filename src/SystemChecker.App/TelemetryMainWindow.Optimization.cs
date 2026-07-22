@@ -84,7 +84,6 @@ public partial class TelemetryMainWindow
         var actions = new StackPanel { Orientation = Orientation.Horizontal };
         actions.Children.Add(Action("다시 분석", async (_, _) => await LoadOptimizationAsync(true), "#F1F2F4", "#24262B"));
         actions.Children.Add(Action("기준 기록", CaptureOptimizationBaseline_Click, "#E7EEF7", "#234D7A"));
-        actions.Children.Add(Action("선택 항목 정리", CleanupSelected_Click, "#24262B", "#FFFFFF"));
         Grid.SetColumn(actions, 1);
         row.Children.Add(actions);
         surface.Child = row;
@@ -163,9 +162,17 @@ public partial class TelemetryMainWindow
         var body = new Grid();
         body.RowDefinitions.Add(new RowDefinition { Height = new GridLength(70) });
         body.RowDefinitions.Add(new RowDefinition { Height = new GridLength(250) });
-        var header = new StackPanel { Margin = new Thickness(20, 0, 20, 0), VerticalAlignment = VerticalAlignment.Center };
-        header.Children.Add(new TextBlock { Text = "저장 공간 정리 미리보기", FontSize = 16, FontWeight = FontWeights.SemiBold });
-        header.Children.Add(new TextBlock { Text = "24시간 이상 된 임시 파일만 표시합니다. 항목을 선택하고 확인한 경우에만 삭제합니다.", Foreground = Muted(), FontSize = 10, Margin = new Thickness(0, 5, 0, 0) });
+        var header = new Grid { Margin = new Thickness(20, 0, 20, 0) };
+        header.ColumnDefinitions.Add(new ColumnDefinition());
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        var heading = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+        heading.Children.Add(new TextBlock { Text = "저장 공간 정리 미리보기", FontSize = 16, FontWeight = FontWeights.SemiBold });
+        heading.Children.Add(new TextBlock { Text = "24시간 이상 된 임시 파일만 표시합니다. 항목을 선택하고 확인한 경우에만 삭제합니다.", Foreground = Muted(), FontSize = 10, Margin = new Thickness(0, 5, 0, 0) });
+        header.Children.Add(heading);
+        var cleanupAction = Action("선택 항목 정리", CleanupSelected_Click, "#24262B", "#FFFFFF");
+        cleanupAction.VerticalAlignment = VerticalAlignment.Center;
+        Grid.SetColumn(cleanupAction, 1);
+        header.Children.Add(cleanupAction);
         body.Children.Add(header);
         var grid = BaseGrid(_cleanupGroups, 52);
         grid.RowStyle = CreateCleanupRowStyle();
