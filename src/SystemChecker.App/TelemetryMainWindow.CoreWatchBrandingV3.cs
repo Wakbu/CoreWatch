@@ -28,6 +28,7 @@ public partial class TelemetryMainWindow
         WrapReportInScroller();
         EnhanceBenchmarkReference();
         EnhanceReportContents();
+        InitializeReportEnhancement();
         InitializeProcessPage();
         ApplyTaskManagerDesign();
         InitializeOptimizationPage();
