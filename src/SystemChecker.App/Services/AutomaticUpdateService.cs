@@ -16,7 +16,7 @@ internal sealed class AutomaticUpdateService
     public AutomaticUpdateService()
     {
         _client = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
-        _client.DefaultRequestHeaders.UserAgent.ParseAdd("CoreWatch/6.1.0");
+        _client.DefaultRequestHeaders.UserAgent.ParseAdd("CoreWatch/6.1.1");
         _client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
         _client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
     }
