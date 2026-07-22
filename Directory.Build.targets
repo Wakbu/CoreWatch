@@ -4,7 +4,7 @@
     <Compile Remove="$(MSBuildProjectDirectory)\App.ModernStartup.cs" />
   </ItemGroup>
   <PropertyGroup Condition="'$(AssemblyName)' == 'CoreWatch'">
-    <Version>6.1.0</Version><FileVersion>6.1.0.0</FileVersion><AssemblyVersion>6.1.0.0</AssemblyVersion>
+    <Version>6.1.1</Version><FileVersion>6.1.1.0</FileVersion><AssemblyVersion>6.1.1.0</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup Condition="'$(AssemblyName)' == 'CoreWatch'">
     <Compile Include="$(MSBuildProjectDirectory)\Services\AutomaticUpdateService.cs" />
@@ -18,5 +18,5 @@
   <ItemGroup Condition="'$(AssemblyName)' == 'CoreWatch.V5.Verification.Final'">
     <Compile Include="$(MSBuildProjectDirectory)\RoadmapFeatureVerification.cs" />
   </ItemGroup>
-  <PropertyGroup Condition="'$(AssemblyName)' == 'CoreWatch-Setup'"><Version>6.1.0</Version></PropertyGroup>
+  <PropertyGroup Condition="'$(AssemblyName)' == 'CoreWatch-Setup'"><Version>6.1.1</Version></PropertyGroup>
 </Project>

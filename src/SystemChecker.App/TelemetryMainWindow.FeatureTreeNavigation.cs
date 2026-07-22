@@ -23,7 +23,7 @@ public partial class TelemetryMainWindow
         AddFeatureTree(navigation, _processNav, [("전체 프로세스", () => SelectProcessTree("모두")), ("앱", () => SelectProcessTree("앱")), ("백그라운드", () => SelectProcessTree("백그라운드 프로세스")), ("Windows", () => SelectProcessTree("Windows 프로세스"))]);
         AddFeatureTree(navigation, HardwareNav, [("CPU", () => ScrollHardware("CPU")), ("GPU", () => ScrollHardware("GPU")), ("메모리", () => ScrollHardware("메모리")), ("저장장치", () => ScrollHardware("저장장치"))]);
         AddFeatureTree(navigation, BenchmarkNav, [("종합 점수", () => ScrollToText(BenchmarkPage, "SYSTEM SCORE")), ("테스트 실행", () => ScrollToText(BenchmarkPage, "TEST CONTROL")), ("디스크·GPU", () => ScrollToText(BenchmarkPage, "STORAGE / GPU")), ("이전 결과", () => ScrollToText(BenchmarkPage, "PREVIOUS RESULTS")), ("내 기록 비교", () => ScrollToText(BenchmarkPage, "LOCAL BENCHMARK")), ("성능 기준", () => ScrollToText(BenchmarkPage, "PERFORMANCE REFERENCE"))]);
-        AddFeatureTree(navigation, _optimizationNav, [("자동 업데이트", () => ScrollToText(_optimizationPage, "자동 업데이트")), ("Windows 저장소", () => ScrollToText(_optimizationPage, "Windows 저장소 설정")), ("네트워크 진단", () => ScrollToText(_optimizationPage, "네트워크 진단")), ("개인화 추천", () => ScrollToText(_optimizationPage, "개인화 추천")), ("전원 설정", () => ScrollToText(_optimizationPage, "전원·성능 설정")), ("백그라운드 부하", () => ScrollToText(_optimizationPage, "백그라운드")), ("메모리 분석", () => ScrollToText(_optimizationPage, "메모리 상세")), ("저장장치 상태", () => ScrollToText(_optimizationPage, "저장장치 상태")), ("시작 프로그램", () => ScrollToText(_optimizationPage, "시작 프로그램 관리")), ("공간 정리", () => ScrollToText(_optimizationPage, "저장 공간 정리"))]);
+        AddFeatureTree(navigation, _optimizationNav, [("Windows 저장소", () => ScrollToText(_optimizationPage, "Windows 저장소 설정")), ("네트워크 진단", () => ScrollToText(_optimizationPage, "네트워크 진단")), ("개인화 추천", () => ScrollToText(_optimizationPage, "개인화 추천")), ("전원 설정", () => ScrollToText(_optimizationPage, "전원·성능 설정")), ("백그라운드 부하", () => ScrollToText(_optimizationPage, "백그라운드")), ("메모리 분석", () => ScrollToText(_optimizationPage, "메모리 상세")), ("저장장치 상태", () => ScrollToText(_optimizationPage, "저장장치 상태")), ("시작 프로그램", () => ScrollToText(_optimizationPage, "시작 프로그램 관리")), ("공간 정리", () => ScrollToText(_optimizationPage, "저장 공간 정리"))]);
         AddFeatureTree(navigation, ReportNav, [("진단 요약", () => ScrollToText(ReportPage, "REPORT SUMMARY")), ("내보내기", () => ScrollToText(ReportPage, "REPORT EXPORT")), ("보고서 데이터", () => ScrollToText(ReportPage, "REPORT DATASET")), ("SMART 상태", () => ScrollToText(ReportPage, "SMART / STORAGE")), ("벤치마크 이력", () => ScrollToText(ReportPage, "SQLITE BENCHMARK"))]);
         foreach (var pair in _featureTrees) pair.Key.Click += (_, _) => ExpandFeatureTree(pair.Key);
         ExpandFeatureTree(OverviewNav);
@@ -52,7 +52,18 @@ public partial class TelemetryMainWindow
 
     private void ExpandFeatureTree(Button owner) { foreach (var pair in _featureTrees) pair.Value.Visibility = pair.Key == owner ? Visibility.Visible : Visibility.Collapsed; }
     private void SelectProcessTree(string kind) { if (_processTabs.TryGetValue(kind, out var button)) button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); }
-    private void ScrollHardware(string category) { var grid = Descendants<DataGrid>(HardwarePage).FirstOrDefault(); var item = _viewModel.HardwareItems.FirstOrDefault(value => value.Category == category); if (grid is not null && item is not null) { grid.ScrollIntoView(item); grid.SelectedItem = item; } }
+    private void ScrollHardware(string category)
+    {
+        HardwareNav.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (_hardwareCategories is null) return;
+            var item = _hardwareCategories.Items.Cast<object>().FirstOrDefault(value => string.Equals(value?.ToString(), category, StringComparison.OrdinalIgnoreCase));
+            if (item is null) return;
+            _hardwareCategories.SelectedItem = item;
+            _hardwareCategories.ScrollIntoView(item);
+        });
+    }
     private void EnsureReportScrollHost()
     {
         if (_reportFeatureScroll is not null || ReportPage.Parent is not Panel host) return;
