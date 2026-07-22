@@ -2,19 +2,22 @@
 
 CoreWatch는 Windows PC의 실시간 성능, 하드웨어 상태, 프로세스, 벤치마크와 보수적인 시스템 최적화 기능을 제공하는 .NET 9 WPF 데스크톱 애플리케이션입니다.
 
-## CoreWatch 5.10.0
+## CoreWatch 6.0.0
 
+- 보고서 생성 전 종합 판정, 데이터 포함 범위와 기준 시각을 확인하는 리포트 요약
+- 진단·최근 텔레메트리·하드웨어·SMART·배터리·벤치마크 이력을 동일 스냅샷으로 JSON·HTML·PDF 생성
+- 자동 업로드 없이 이 PC에서만 보고서를 생성하는 개인정보 안내
 - 사이드바 탭별 접이식 기능 트리와 섹션 바로가기
 - TRIM, 볼륨 여유 공간, 파일 시스템 오류 상태와 보수적인 권장 사항
 - 외부 서버 없이 이 PC의 동일 버전 벤치마크 기록만 비교
-- 설치 없는 실행본: `artifacts/publish/CoreWatch-v5.10.0-win-x64/CoreWatch.exe`
-- [GitHub v5.10.0 릴리스](https://github.com/Wakbu/CoreWatch/releases/tag/v5.10.0)
-- [설치 없는 Windows x64 ZIP 다운로드](https://github.com/Wakbu/CoreWatch/releases/download/v5.10.0/CoreWatch-v5.10.0-win-x64.zip)
-  - 크기: `85,606,116 bytes`
-  - SHA-256: `EB75F78D44260C3FD351D8D81756ED173BA0A0A1A8CF389192AE415C04B1EECE`
-- [Windows x64 설치 프로그램 다운로드](https://github.com/Wakbu/CoreWatch/releases/download/v5.10.0/CoreWatch-v5.10.0-Setup.exe)
-  - 크기: `320,031,736 bytes`
-  - SHA-256: `C1A26F919EC66B303CB6642C5A914570E14D70F0E846EF5FC088FB4C484AC2C8`
+- 설치 없는 실행본: `artifacts/publish/CoreWatch-v6.0.0-win-x64/CoreWatch.exe`
+- [GitHub v6.0.0 릴리스](https://github.com/Wakbu/CoreWatch/releases/tag/v6.0.0)
+- [설치 없는 Windows x64 ZIP 다운로드](https://github.com/Wakbu/CoreWatch/releases/download/v6.0.0/CoreWatch-v6.0.0-win-x64.zip)
+  - 크기: `85,609,445 bytes`
+  - SHA-256: `05421DA064FA5567C73F117E99B282F6136B3376F8CEC57BF5E14F03954189AE`
+- [Windows x64 설치 프로그램 다운로드](https://github.com/Wakbu/CoreWatch/releases/download/v6.0.0/CoreWatch-v6.0.0-Setup.exe)
+  - 크기: `320,048,118 bytes`
+  - SHA-256: `81A818DE48A5BF9B5AA2944A7728590970D7B12ADBD8B913584E16354A911A60`
 
 - Windows GetPerformanceInfo 기반 물리 메모리·커밋·캐시·커널 풀 분석
 - 페이지 파일 자동 관리, 할당·현재·최고 사용량 진단
@@ -86,7 +89,7 @@ dotnet list src/SystemChecker.App/CoreWatch.V5.1.Release.csproj package --vulner
 dotnet run --project tools/CoreWatch.V5.Verification/CoreWatch.V5.Verification.Final.csproj -c Release
 ```
 
-현재 자동 무결성 검증은 `37/37`이며 알려진 취약 패키지는 없습니다. 자세한 상태는 [CURRENT_STATE_COREWATCH_V5_1.md](CURRENT_STATE_COREWATCH_V5_1.md)를 참고하세요.
+현재 자동 무결성 검증은 핵심 `37/37`과 확장 `8/8`이며 알려진 취약 패키지는 없습니다. 자세한 상태는 [CURRENT_STATE_COREWATCH_V5_1.md](CURRENT_STATE_COREWATCH_V5_1.md)를 참고하세요.
 
 
 

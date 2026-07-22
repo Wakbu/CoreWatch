@@ -14,6 +14,6 @@
 
 ## 현재 구현 버전
 
-- 로컬 벤치마크 비교·저장장치 진단·기능 트리: `5.10.0`
-- 실행 경로: `artifacts/publish/CoreWatch-v5.10.0-win-x64/CoreWatch.exe`
-- 설치 프로그램: `artifacts/CoreWatch-v5.10.0-Setup.exe`
+- 통합 리포트 강화: `6.0.0`
+- 실행 경로: `artifacts/publish/CoreWatch-v6.0.0-win-x64/CoreWatch.exe`
+- 설치 프로그램: `artifacts/CoreWatch-v6.0.0-Setup.exe`
