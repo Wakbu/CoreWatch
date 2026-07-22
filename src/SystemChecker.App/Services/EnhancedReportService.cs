@@ -26,7 +26,7 @@ public sealed class EnhancedReportService
             : assessment == "정상" ? "현재 수집 범위에서 주의 또는 위험으로 분류된 항목이 없습니다."
             : $"진단 {warnings}개와 저장장치 상태 {storageWarnings}개를 보고서에서 확인하세요.";
         var samples = Math.Max(Math.Max(cpuValues.Count, memoryValues.Count), Math.Max(diskValues.Count, networkValues.Count));
-        return new("6.0.0", DateTimeOffset.Now, Environment.MachineName, RuntimeInformation.OSDescription, assessment, reason,
+        return new("6.1.0", DateTimeOffset.Now, Environment.MachineName, RuntimeInformation.OSDescription, assessment, reason,
             $"HW {hw.Count} · 진단 {issues.Count} · 이력 {recent.Count} · 표본 {samples}",
             "이 보고서는 로컬에서 생성되며 CoreWatch가 자동 업로드하거나 외부 서버로 전송하지 않습니다.",
             hw, health, issues, benchmark, recent,

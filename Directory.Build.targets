@@ -3,4 +3,20 @@
     <!-- 초기 StartupUri 우회 구현은 WPF가 null을 허용하지 않아 컴파일에서 제외한다. -->
     <Compile Remove="$(MSBuildProjectDirectory)\App.ModernStartup.cs" />
   </ItemGroup>
+  <PropertyGroup Condition="'$(AssemblyName)' == 'CoreWatch'">
+    <Version>6.1.0</Version><FileVersion>6.1.0.0</FileVersion><AssemblyVersion>6.1.0.0</AssemblyVersion>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(AssemblyName)' == 'CoreWatch'">
+    <Compile Include="$(MSBuildProjectDirectory)\Services\AutomaticUpdateService.cs" />
+    <Compile Include="$(MSBuildProjectDirectory)\Services\StorageMaintenanceService.cs" />
+    <Compile Include="$(MSBuildProjectDirectory)\Services\NetworkDiagnosticsService.cs" />
+    <Compile Include="$(MSBuildProjectDirectory)\Services\PersonalizedRecommendationService.cs" />
+    <Compile Include="$(MSBuildProjectDirectory)\TelemetryMainWindow.RoadmapFeatures.cs" />
+    <Compile Include="$(MSBuildProjectDirectory)\TelemetryMainWindow.ScrollCoordination.cs" />
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute"><_Parameter1>CoreWatch.V5.Verification.Final</_Parameter1></AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup Condition="'$(AssemblyName)' == 'CoreWatch.V5.Verification.Final'">
+    <Compile Include="$(MSBuildProjectDirectory)\RoadmapFeatureVerification.cs" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(AssemblyName)' == 'CoreWatch-Setup'"><Version>6.1.0</Version></PropertyGroup>
 </Project>
